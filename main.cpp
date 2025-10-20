@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits> // <-- TAMBAHKAN INI
 #include "auth/Login.h"
 #include "admin/MenuAdmin.h"
 #include "superAdmin/MenuSuperAdmin.h"
@@ -7,13 +8,18 @@
 #include "karyawan/menuKaryawan.h"
 #include "kasir/menuKasir.h"
 #include "ob/menuOb.h"
+
 using namespace std;
 
 int main() {
+
     Login login;
     login.prosesLogin();
 
     int role = login.getRole();
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     if (role == 1) {
         MenuAdmin adminMenu;
         adminMenu.tampilkanMenu();
