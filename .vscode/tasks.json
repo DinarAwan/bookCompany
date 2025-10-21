@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Project C++ (G++)",
+      "type": "shell",
+      "command": "C:\\MinGW\\bin\\g++.exe",
+
+      // INI BAGIAN PENTING:
+      // Kita mendaftarkan setiap file .cpp satu per satu,
+      // persis seperti perintah yang Anda berikan.
+      "args": [
+        "-Wall",
+        "-Wextra",
+        "-g3",
+        "${workspaceFolder}/main.cpp",
+        "${workspaceFolder}/auth/Login.cpp",
+        "${workspaceFolder}/admin/MenuAdmin.cpp",
+        "${workspaceFolder}/superAdmin/MenuSuperAdmin.cpp",
+        "${workspaceFolder}/pengguna/menuPengguna.cpp",
+        "${workspaceFolder}/satpam/MenuSatpam.cpp",
+        "${workspaceFolder}/karyawan/menuKaryawan.cpp",
+        "${workspaceFolder}/kasir/menuKasir.cpp",
+        "${workspaceFolder}/ob/menuOb.cpp",
+
+        // File output
+        "-o",
+        "${workspaceFolder}/output/main.exe"
+      ],
+
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
