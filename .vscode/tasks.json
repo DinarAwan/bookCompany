@@ -5,10 +5,9 @@
       "label": "Build Project C++ (G++)",
       "type": "shell",
       "command": "C:\\MinGW\\bin\\g++.exe",
-
-      // INI BAGIAN PENTING:
-      // Kita mendaftarkan setiap file .cpp satu per satu,
-      // persis seperti perintah yang Anda berikan.
+      
+      // INI ADALAH DAFTAR LENGKAP FILE ANDA
+      // (Didasarkan pada perintah asli Anda)
       "args": [
         "-Wall",
         "-Wextra",
@@ -22,12 +21,12 @@
         "${workspaceFolder}/karyawan/menuKaryawan.cpp",
         "${workspaceFolder}/kasir/menuKasir.cpp",
         "${workspaceFolder}/ob/menuOb.cpp",
-
+        
         // File output
         "-o",
         "${workspaceFolder}/output/main.exe"
       ],
-
+      
       "options": {
         "cwd": "${workspaceFolder}"
       },

@@ -2,16 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C/C++ Runner: Debug Session",
+      "name": "Jalankan Project C++ (G++)",
       "type": "cppdbg",
       "request": "launch",
+      "program": "${workspaceFolder}/output/main.exe",
       "args": [],
       "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
       "externalConsole": true,
-      "cwd": "d:/Masa Perkuliahan/Semester-3/Struktur Data/TugasPro",
-      "program": "${workspaceFolder}/output/main.exe",
       "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
+      "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
@@ -20,6 +21,25 @@
         }
       ],
       "preLaunchTask": "Build Project C++ (G++)"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "d:/Masa Perkuliahan/Semester-3/Struktur Data/TugasPro",
+      "program": "d:/Masa Perkuliahan/Semester-3/Struktur Data/TugasPro/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
     }
   ]
 }

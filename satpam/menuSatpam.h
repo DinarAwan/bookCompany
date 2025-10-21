@@ -4,6 +4,9 @@
 class MenuSatpam {
 public:
     void tampilkanMenu();
+
+private:
+    void lihatTugas();
 };
 
 #endif
