@@ -4,6 +4,15 @@
 class MenuAdmin {
 public:
     void tampilkanMenu();
+
+
+private:
+    void kelolaTugasSatpam();
+    void tambahTugasSatpam();
+    void lihatTugasSatpam();
+    void editTugasSatpam();
+    void hapusTugasSatpam();
+    int getNextTaskId();
 };
 
 #endif
