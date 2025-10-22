@@ -59,7 +59,8 @@ void MenuSatpam::lihatTugas() {
     }
 
     if (!adaTugas) {
-        cout << "Belum ada tugas yang ditambahkan oleh Admin.\n";
+        cout << "Belum ada tugas yang ditambahkan oleh Adminnn.\n";
+
     }
     file.close();
 }
