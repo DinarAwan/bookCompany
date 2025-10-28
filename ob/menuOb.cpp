@@ -163,6 +163,36 @@ public:
         }
     }
 
+    //=========== Lapor Kerusakan Fasilitas ===========
+    class Fasilitas {
+    public:
+    int id;
+    string namaFasilitas;
+    string deskripsiKerusakan;
+    };
+
+    void laporKerusakanFasilitas() {
+        Fasilitas fasilitasBaru;
+        cout << "Masukkan ID Fasilitas: ";
+        cin >> fasilitasBaru.id;
+        cin.ignore();
+
+        cout << "Masukkan Nama Fasilitas: ";
+        getline(cin, fasilitasBaru.namaFasilitas);
+
+        cout << "Masukkan Deskripsi Kerusakan: ";
+        getline(cin, fasilitasBaru.deskripsiKerusakan);
+
+        ofstream file("laporan_fasilitas.txt", ios::app);
+        if (file.is_open()) {
+            file << fasilitasBaru.id << "|" << fasilitasBaru.namaFasilitas << "|" << fasilitasBaru.deskripsiKerusakan << "|\n";
+            file.close();
+            cout << "Laporan kerusakan fasilitas berhasil dikirim!\n";
+        } else {
+            cout << " Gagal membuka file laporan fasilitas.\n";
+        }
+    }
+
     // ========== MENU UTAMA ==========
     void tampilkanMenu() {
         int pilihan;
@@ -171,6 +201,7 @@ public:
             cout << "1. Tambah laporan\n";
             cout << "2. Lihat laporan\n";
             cout << "3. Hapus laporan\n";
+            cout << "4. Lapor Kerusakan Fasilitas\n";
             cout << "0. Logout\n";
             cout << "Pilih menu: ";
             cin >> pilihan;
@@ -184,6 +215,9 @@ public:
                     break;
                 case 3:
                     hapusLaporan();
+                    break;
+                case 4:
+                    laporKerusakanFasilitas();
                     break;
                 case 0:
                     cout << "Logout berhasil!\n";
