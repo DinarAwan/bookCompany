@@ -23,7 +23,7 @@ struct Visitor {
         : nama(n), tujuan(t), waktu(w), next(nullptr) {}
 };
 
-// Fungsi util untuk load dari file ke linked list (mengembalikan head)
+// Fungsi util untuk load dari file ke linked list (mengembalikan hea
 static Visitor* loadPengunjungFromFile() {
     std::ifstream file(FILE_PENGUNJUNG);
     if (!file.is_open()) return nullptr;
