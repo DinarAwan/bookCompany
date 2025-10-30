@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ctime>
 using namespace std;
 
 // ===================== CLASS LAPORAN =====================
@@ -19,10 +20,101 @@ public:
     }
 };
 
-// ===================== CLASS MENU OB =====================
+// ===================== CLASS ABSEN OB  =====================
+class AbsenOb {
+    public: 
+    struct Absen {
+        int id;
+        string nama;
+        string tanggal;
+        string waktuMasuk;
+        string waktuKeluar;
+        Absen* next;
+    };
+    Absen* head;
+
+    AbsenOb() {
+        head = NULL;
+    }
+
+    string ambilWaktuSekarang(){
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        char buffer[10];
+        strftime(buffer, sizeof(buffer), "%H:%M:%S", ltm);
+        return string(buffer);
+    }
+
+    string ambilTanggalSekarang(){
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        char buffer[11];
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d", ltm);
+        return string(buffer);
+    }
+
+    void absenMasuk() {
+        int id;
+        string nama;
+        cout<<"masukkan id ob: ";
+        cin>>id;
+        cin.ignore();
+        cout<<"masukkan nama ob: ";
+        getline(cin,nama);
+
+        string tanggal = ambilTanggalSekarang();
+        string waktuMasuk = ambilWaktuSekarang();
+        string waktuKeluar = "-";
+
+        Absen* baru = new Absen{id, nama, tanggal, waktuMasuk, waktuKeluar, NULL};
+
+        if (head == NULL) {
+            head = baru;
+            head->next = head; //ciircular
+        } else {
+            Absen* temp = head;
+            while (temp->next != head) {
+                temp = temp->next;
+            }
+            temp->next = baru;
+            baru->next = head; //circular
+        }
+        cout<<nama<<" berhasil absen masuk pada "<<tanggal<<" pukul "<<waktuMasuk<<endl;
+    }
+
+    void tampilAbsenSendiri(int idCari) {
+    if (head == NULL) {
+        cout << "Belum ada data absensi.\n";
+        return;
+    }
+
+    Absen* temp = head;
+    bool ditemukan = false;
+
+    do {
+        if (temp->id == idCari) {
+            cout << "\n===== Data Absensi Anda =====\n";
+            cout << "ID           : " << temp->id << endl;
+            cout << "Nama         : " << temp->nama << endl;
+            cout << "Tanggal      : " << temp->tanggal << endl;
+            cout << "Waktu Masuk  : " << temp->waktuMasuk << endl;
+            cout << "Waktu Keluar : " << temp->waktuKeluar << endl;
+            ditemukan = true;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    if (!ditemukan)
+        cout << "Belum ada data absensi untuk ID tersebut.\n";
+}
+
+};
+
+// ===================== CLASS LAPORAN OB =====================
 class MenuOb {
 private:
     laporan* head;
+    AbsenOb absen;
 
     // Simpan ke file TXT
     void simpanKeFile() {
@@ -108,7 +200,7 @@ public:
         cout << "✅ Laporan berhasil ditambahkan!\n";
     }
 
-    // ========== LIHAT LAPORAN ==========
+    
     void lihatLaporan() {
         if (head == nullptr) {
             cout << "Belum ada laporan.\n";
@@ -126,7 +218,7 @@ public:
         }
     }
 
-    // ========== HAPUS LAPORAN ==========
+    
     void hapusLaporan() {
         if (head == nullptr) {
             cout << "Belum ada laporan untuk dihapus.\n";
@@ -202,6 +294,8 @@ public:
             cout << "2. Lihat laporan\n";
             cout << "3. Hapus laporan\n";
             cout << "4. Lapor Kerusakan Fasilitas\n";
+            cout << "5. Absen Masuk\n";
+            cout << "6. Lihat Data Absen\n";
             cout << "0. Logout\n";
             cout << "Pilih menu: ";
             cin >> pilihan;
@@ -219,6 +313,16 @@ public:
                 case 4:
                     laporKerusakanFasilitas();
                     break;
+                case 5:
+                absen.absenMasuk();
+                break;
+                case 6: {
+                    int idCari;
+                    cout << "Masukkan ID Anda untuk melihat data absen: ";
+                    cin >> idCari;
+                    absen.tampilAbsenSendiri(idCari);
+                    break;
+                }
                 case 0:
                     cout << "Logout berhasil!\n";
                     break;
@@ -228,5 +332,4 @@ public:
         } while (pilihan != 0);
     }
 };
-
 
