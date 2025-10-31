@@ -1,4 +1,3 @@
-// This file is a case-correct copy of the existing header to match includes
 #ifndef MENUSATPAM_H
 #define MENUSATPAM_H
 
@@ -10,9 +9,13 @@ public:
     void laporKejadian();
     void selesaikanTugas();
     void catatPengunjung();
-
-private:
-    // Any private members if needed
+    void tampilkanPengunjung();
+    void ubahPengunjung();
+    void hapusPengunjung();
+    void logKendaraan();
+    void catatBarang();
+    void laporanHarian();
+    void pengaturanProfil();
 };
 
 #endif
