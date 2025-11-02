@@ -4,36 +4,57 @@
 #include <string>
 using namespace std;
 
-// ===== CLASS LAPORAN =====
-class laporan {
+// ===================== CLASS ABSEN OB =====================
+class AbsenOb {
 public:
-    int id;
-    string tanggal;
-    string JenisPekerjaan;
-    string LamaPekerjaan;
-    string laporanHariIni;
-    laporan* next;
+    AbsenOb();
+    void absenMasuk();
+    void tampilAbsenSendiri(int idCari);
 
-    laporan(int id, string tanggal, string jenis, string lama, string laporanHarian)
-        : id(id), tanggal(tanggal), JenisPekerjaan(jenis),
-          LamaPekerjaan(lama), laporanHariIni(laporanHarian), next(nullptr) {}
+private:
+    struct Absen {
+        int id;
+        string nama;
+        string tanggal;
+        string waktuMasuk;
+        string waktuKeluar;
+        Absen* next;
+    };
+    Absen* head;
+
+    string ambilWaktuSekarang();
+    string ambilTanggalSekarang();
 };
 
-// ===== CLASS MENU OB =====
+// ===================== CLASS MENU OB =====================
 class MenuOb {
+public:
+    MenuOb();
+    void tampilkanMenu();
+
 private:
+    struct laporan {
+        int id;
+        string tanggal;
+        string JenisPekerjaan;
+        string LamaPekerjaan;
+        string laporanHariIni;
+        laporan* next;
+        laporan(int id_, string t, string j, string l, string lap)
+            : id(id_), tanggal(t), JenisPekerjaan(j),
+              LamaPekerjaan(l), laporanHariIni(lap), next(nullptr) {}
+    };
+
     laporan* head;
+    AbsenOb absen;
 
     void simpanKeFile();
     void loadDariFile();
     int getNextId();
-
-public:
-    MenuOb();
     void tambahLaporan();
     void lihatLaporan();
     void hapusLaporan();
-    void tampilkanMenu();
+    void laporKerusakanFasilitas();
 };
 
 #endif
