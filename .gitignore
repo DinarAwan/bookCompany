@@ -1,3 +1,13 @@
 .vscode/
 
-.exe
+
+# Abaikan file hasil compile
+output/
+# Abaikan file hasil compile C++
+*.exe
+*.obj
+*.o
+*.out
+*.log
+output/
+
