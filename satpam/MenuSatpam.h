@@ -16,6 +16,7 @@ public:
     void catatBarang();
     void laporanHarian();
     void pengaturanProfil();
+    void modeDarurat();
 };
 
 #endif
