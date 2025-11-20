@@ -1,5 +1,6 @@
 .vscode/
 
+
 # Abaikan file hasil compile
 output/
 # Abaikan file hasil compile C++
@@ -9,3 +10,4 @@ output/
 *.out
 *.log
 output/
+
