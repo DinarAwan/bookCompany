@@ -13,13 +13,20 @@ const string FILE_TUGAS = "tugas_satpam.txt";
 
 void MenuAdmin::tampilkanMenu() {
     int pilihan;
+    string array[5];
+    array[0] = "1. Tambah Data Buku";
+    array[1] = "2. Lihat Data Bukuu";
+    array[2] = "3. Hapus Data Bukuu";
+    array[3] = "4. Kelola Tugas Satpam";
+    array[4] = "4. logout";
+    
     do {
         cout << "========== MENU ADMIN ==========\n";
-        cout << "1. Tambah Data Buku\n";
-        cout << "2. Lihat Data Buku\n";
-        cout << "3. Hapus Data Buku\n";
-        cout << "4. Kelola Tugas Satpam\n"; // <-- OPSI BARU
-        cout << "0. Logout\n";
+        cout << array[0]<<endl;
+        cout << array[1]<<endl;
+        cout << array[2]<<endl;
+        cout << array[3]<<endl;
+        cout << array[4]<<endl;
         cout << "Pilih menu: ";
         cin >> pilihan;
 
