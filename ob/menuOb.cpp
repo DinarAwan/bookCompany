@@ -21,6 +21,7 @@ public:
 
     AbsenOb() {
         head = nullptr;
+        loadDariFile();
     }
 
     string ambilWaktuSekarang() {
@@ -68,6 +69,8 @@ public:
         }
 
         cout << nama << " berhasil absen masuk pada " << tanggal << " pukul " << waktuMasuk << endl;
+        simpankeFile();
+
     }
 
     void tampilAbsenSendiri(int idCari) {
@@ -126,11 +129,77 @@ public:
         if(!ditemukan){
             cout<<"anda belum absen masuk hari ini"<<endl;
         }
+        simpankeFile();
 
-        
     }
+
+//==================== SIMPAN DATA ABSEN =====================
+    void simpankeFile(){
+        ofstream file("absenOb.txt");
+
+        if(!file.is_open()){
+            cout<<"gagal menyimpan data absen"<<endl;
+            return;
+        }
+
+        if(head == nullptr){
+            file.close();
+            return;
+        }
+
+        Absen* temp = head;
+        do{
+            file<<temp->id<<"|"
+            <<temp->nama<<"|"
+            <<temp->tanggal<<"|"
+            <<temp->waktuMasuk<<"|"
+            <<temp->waktuKeluar<<"|\n";
+            temp = temp->next;
+    }while(temp != head);
+
+        file.close();
 };
 
+void loadDariFile(){
+ ifstream file("absenOb.txt");
+ if(!file.is_open()){
+    return;
+ }
+
+    string line;
+ while (getline(file, line)) {
+            if (line.empty()) continue;
+
+            size_t p1 = line.find('|');
+            size_t p2 = line.find('|', p1+1);
+            size_t p3 = line.find('|', p2+1);
+            size_t p4 = line.find('|', p3+1);
+
+            int id = stoi(line.substr(0, p1));
+            string nama = line.substr(p1+1, p2-p1-1);
+            string tanggal = line.substr(p2+1, p3-p2-1);
+            string masuk = line.substr(p3+1, p4-p3-1);
+            string keluar = line.substr(p4+1);
+
+            Absen* baru = new Absen{id, nama, tanggal, masuk, keluar, nullptr};
+
+            if(head == nullptr){
+                head = baru;
+                head->next = head;
+            } else {
+                Absen* temp = head;
+                while(temp->next != head)
+                    temp = temp->next;
+                temp->next = baru;
+                baru->next = head;
+            }
+}
+    file.close();
+}
+
+
+
+};
 // ===================== LAPORAN PEKERJAAN =====================
 struct laporan {
     int id;
