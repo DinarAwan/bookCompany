@@ -1,17 +1,15 @@
-#ifndef MENUOB_H
-#define MENUOB_H
+#ifndef MENU_OB_H
+#define MENU_OB_H
 
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <ctime>
 using namespace std;
 
-// ===================== CLASS ABSEN OB =====================
+// ===================== ABSENSI OB =====================
 class AbsenOb {
 public:
-    AbsenOb();
-    void absenMasuk();
-    void tampilAbsenSendiri(int idCari);
-
-private:
     struct Absen {
         int id;
         string nama;
@@ -20,41 +18,48 @@ private:
         string waktuKeluar;
         Absen* next;
     };
+
     Absen* head;
 
+    AbsenOb();
     string ambilWaktuSekarang();
     string ambilTanggalSekarang();
+    void absenMasuk();
+    void tampilAbsenSendiri(int idCari);
+    void absenKeluar();
+    void simpankeFile();
+    void loadDariFile();
 };
 
-// ===================== CLASS MENU OB =====================
+// ===================== STRUCT LAPORAN =====================
+struct laporan {
+    int id;
+    string tanggal;
+    string jenis;
+    string lama;
+    string laporanHariIni;
+    laporan* next;
+
+    laporan(int _id, string _t, string _j, string _l, string _h);
+};
+
+// ===================== MENU OB =====================
 class MenuOb {
-public:
-    MenuOb();
-    void tampilkanMenu();
-
 private:
-    struct laporan {
-        int id;
-        string tanggal;
-        string JenisPekerjaan;
-        string LamaPekerjaan;
-        string laporanHariIni;
-        laporan* next;
-        laporan(int id_, string t, string j, string l, string lap)
-            : id(id_), tanggal(t), JenisPekerjaan(j),
-              LamaPekerjaan(l), laporanHariIni(lap), next(nullptr) {}
-    };
-
     laporan* head;
     AbsenOb absen;
 
-    void simpanKeFile();
+public:
+    MenuOb();
     void loadDariFile();
+    void simpanKeFile();
     int getNextId();
+
     void tambahLaporan();
     void lihatLaporan();
     void hapusLaporan();
     void laporKerusakanFasilitas();
+    void tampilkanMenu();
 };
 
 #endif

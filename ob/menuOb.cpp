@@ -427,8 +427,3 @@ public:
     }
 };
 
-int main() {
-    MenuOb ob;
-    ob.tampilkanMenu();
-    return 0;
-}
