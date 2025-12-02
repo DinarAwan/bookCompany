@@ -1,9 +1,52 @@
-#include "menuOb.h"
+#include "MenuOb.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <ctime>
+#include <limits>
+
 using namespace std;
+
+// ===================== KONFIGURASI QUEUE TUGAS (DARI ADMIN) =====================
+const string FILE_TUGAS_OB = "tugas_ob.txt";
+const int MAX_QUEUE = 5; 
+string queueOb[MAX_QUEUE];
+int front = -1;
+int rear = -1;
+
+// --- FUNGSI BANTUAN QUEUE: SINKRONISASI ---
+void muatAntrian() {
+    ifstream file(FILE_TUGAS_OB);
+    string line;
+    
+    front = -1;
+    rear = -1;
+
+    while (getline(file, line)) {
+        if (!line.empty()) {
+            if (front == -1) front = 0;
+            rear = (rear + 1) % MAX_QUEUE;
+            queueOb[rear] = line;
+        }
+    }
+    file.close();
+}
+
+void simpanAntrian() {
+    ofstream file(FILE_TUGAS_OB, ios::trunc);
+    
+    if (front == -1) { 
+        file.close(); return; 
+    }
+
+    int i = front;
+    while (true) {
+        file << queueOb[i] << "\n";
+        if (i == rear) break;
+        i = (i + 1) % MAX_QUEUE; 
+    }
+    file.close();
+}
 
 // ===================== IMPLEMENTASI ABSEN OB =====================
 AbsenOb::AbsenOb() {
@@ -86,6 +129,7 @@ void AbsenOb::tampilAbsenSendiri(int idCari) {
 MenuOb::MenuOb() {
     head = nullptr;
     loadDariFile();
+    // Tidak perlu muatAntrian() disini karena akan dipanggil di tampilkanMenu()
 }
 
 void MenuOb::simpanKeFile() {
@@ -147,7 +191,7 @@ int MenuOb::getNextId() {
 
 void MenuOb::tambahLaporan() {
     int id = getNextId();
-    cin.ignore();
+    cin.ignore(); // Bersihkan buffer sebelum getline
 
     string tanggal, jenis, lama, laporanHarian;
 
@@ -253,19 +297,76 @@ void MenuOb::laporKerusakanFasilitas() {
     }
 }
 
+// ===================== FITUR BARU: QUEUE TUGAS =====================
+
+void MenuOb::lihatTugasSaya() {
+    if (front == -1) {
+        cout << "[INFO] Tidak ada tugas. Anda bisa bersantai!\n";
+        return;
+    }
+
+    cout << "\n=== Daftar Tugas Yang Harus Dikerjakan (FIFO) ===\n";
+    int i = front;
+    int urutan = 1;
+    while (true) {
+        if (i == front) cout << "[PRIORITAS] ";
+        else cout << "            ";
+        
+        cout << "Tugas " << urutan++ << ": " << queueOb[i] << endl;
+
+        if (i == rear) break;
+        i = (i + 1) % MAX_QUEUE;
+    }
+}
+
+void MenuOb::selesaikanTugas() {
+    if (front == -1) {
+        cout << "[INFO] Antrian kosong! Tidak ada tugas untuk diselesaikan.\n";
+        return;
+    }
+
+    string tugasSelesai = queueOb[front];
+
+    // Logika Dequeue
+    if (front == rear) {
+        front = -1;
+        rear = -1;
+    } else {
+        front = (front + 1) % MAX_QUEUE;
+    }
+
+    simpanAntrian(); // Simpan perubahan ke file
+
+    cout << "\n[SUKSES] Anda telah menyelesaikan tugas:\n";
+    cout << ">>> \"" << tugasSelesai << "\" <<<\n";
+    cout << "Tugas dihapus dari daftar antrian.\n";
+}
+
+// ===================== MAIN MENU LOOP =====================
+
 void MenuOb::tampilkanMenu() {
+    // PENTING: Muat tugas setiap kali menu dibuka agar sinkron dengan Admin
+    muatAntrian();
+
     int pilihan;
     do {
         cout << "\n========== MENU OB ==========\n";
-        cout << "1. Tambah laporan\n";
-        cout << "2. Lihat laporan\n";
-        cout << "3. Hapus laporan\n";
+        cout << "1. Tambah laporan Harian\n";
+        cout << "2. Lihat laporan Harian\n";
+        cout << "3. Hapus laporan Harian\n";
         cout << "4. Lapor Kerusakan Fasilitas\n";
         cout << "5. Absen Masuk\n";
         cout << "6. Lihat Data Absen\n";
+        cout << "7. Lihat Daftar Tugas (Dari Admin)\n"; // MENU BARU
+        cout << "8. Selesaikan Tugas (Dequeue)\n";    // MENU BARU
         cout << "0. Logout\n";
         cout << "Pilih menu: ";
-        cin >> pilihan;
+        
+        while (!(cin >> pilihan)) {
+            cout << "Input tidak valid. Masukkan angka: ";
+            cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Bersihkan newline
 
         switch (pilihan) {
             case 1: tambahLaporan(); break;
@@ -280,11 +381,10 @@ void MenuOb::tampilkanMenu() {
                 absen.tampilAbsenSendiri(idCari);
                 break;
             }
-            case 0:
-                cout << "Logout berhasil!\n";
-                break;
-            default:
-                cout << "Pilihan tidak valid!\n";
+            case 7: lihatTugasSaya(); break; // Panggil fungsi queue
+            case 8: selesaikanTugas(); break; // Panggil fungsi queue
+            case 0: cout << "Logout berhasil!\n"; break;
+            default: cout << "Pilihan tidak valid!\n";
         }
     } while (pilihan != 0);
 }

@@ -55,6 +55,8 @@ private:
     void lihatLaporan();
     void hapusLaporan();
     void laporKerusakanFasilitas();
+    void lihatTugasSaya();
+    void selesaikanTugas();
 };
 
 #endif

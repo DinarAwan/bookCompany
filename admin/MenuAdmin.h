@@ -13,6 +13,9 @@ private:
     void editTugasSatpam();
     void hapusTugasSatpam();
     int getNextTaskId();
+    void kelolaTugasOb();
+    void tambahTugasOb();
+    void lihatTugasOb();
 };
 
 #endif
