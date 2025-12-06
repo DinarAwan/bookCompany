@@ -18,20 +18,20 @@ using namespace std;
  * penyimpanan data persisten (semua data log dan konfigurasi).
  */
 
-const string FILE_TUGAS_SATPAM     = "tugas_satpam.txt";        ///< Daftar tugas yang harus dilakukan.
-const string FILE_ABSEN_SATPAM     = "absen_satpam.txt";        ///< Log catatan waktu masuk dan pulang.
-const string FILE_LAPORAN_SATPAM   = "laporan_satpam.txt";      ///< Arsip laporan kejadian/insiden.
-const string FILE_TUGAS_SELESAI    = "tugas_selesai.txt";       ///< Log tugas yang sudah ditandai selesai.
-const string FILE_PENGUNJUNG       = "pengunjung.txt";          ///< Database data pengunjung (Linked List).
-const string FILE_KENDARAAN        = "log_kendaraan.txt";       ///< Log kendaraan yang melintas/parkir.
+const string FILE_TUGAS_SATPAM     = "tugas_satpam.txt";     ///< Daftar tugas yang harus dilakukan.
+const string FILE_ABSEN_SATPAM     = "absen_satpam.txt";     ///< Log catatan waktu masuk dan pulang.
+const string FILE_LAPORAN_SATPAM   = "laporan_satpam.txt";   ///< Arsip laporan kejadian/insiden.
+const string FILE_TUGAS_SELESAI    = "tugas_selesai.txt";    ///< Log tugas yang sudah ditandai selesai.
+const string FILE_PENGUNJUNG       = "pengunjung.txt";       ///< Database data pengunjung (Linked List).
+const string FILE_KENDARAAN        = "log_kendaraan.txt";    ///< Log kendaraan yang melintas/parkir.
 const string FILE_BARANG           = "barang_hilang_ditemukan.txt"; ///< Log barang hilang atau ditemukan.
-const string FILE_PROFIL           = "profil_satpam.txt";       ///< Data konfigurasi profil satpam.
-const string FILE_LAPORAN_HARIAN   = "laporan_harian.txt";      ///< Ringkasan laporan kegiatan harian.
-const string FILE_EMERGENCY_LOG    = "emergency_log.txt";       ///< Catatan log panggilan darurat.
-const string FILE_PATROLI          = "log_patroli.txt";         ///< Log catatan waktu dan area patroli.
+const string FILE_PROFIL           = "profil_satpam.txt";    ///< Data konfigurasi profil satpam.
+const string FILE_LAPORAN_HARIAN   = "laporan_harian.txt";   ///< Ringkasan laporan kegiatan harian.
+const string FILE_EMERGENCY_LOG    = "emergency_log.txt";    ///< Catatan log panggilan darurat.
+const string FILE_PATROLI          = "log_patroli.txt";      ///< Log catatan waktu dan area patroli.
 
 // ============================================================================
-//                        STRUKTUR DATA LINKED LIST (Pengunjung)
+//                      STRUKTUR DATA LINKED LIST (Pengunjung)
 // ============================================================================
 /**
  * @brief Struktur node untuk menyimpan data Pengunjung.
@@ -46,7 +46,7 @@ struct Visitor {
 };
 
 // ============================================================================
-//                        FUNGSI PENDUKUNG LINKED LIST
+//                          FUNGSI PENDUKUNG LINKED LIST
 // ============================================================================
 
 /**
@@ -146,7 +146,7 @@ Visitor* bacaDariFile() {
         string waktu  = baris.substr(p2 + 3);
 
         // 7. Membersihkan karakter newline/carriage return yang mungkin tersisa
-        //    (Implementasi manual tanpa <algorithm> agar sesuai batasan library)
+        //    (Implementasi manual tanpa <algorithm> agar sesuai batasan library)
         while (!waktu.empty() && (waktu.back() == '\n' || waktu.back() == '\r')) {
             waktu.pop_back(); 
         }
@@ -184,7 +184,7 @@ bool simpanKeFile(Visitor *head) {
         string waktu = temp->waktu;
         
         // 5. Pastikan waktu bersih dari karakter kontrol sebelum disimpan
-        //    (Implementasi manual)
+        //    (Implementasi manual)
         while (!waktu.empty() && (waktu.back() == '\n' || waktu.back() == '\r')) {
             waktu.pop_back();
         }
@@ -219,7 +219,7 @@ void hapusSemua(Visitor *&head) {
         head = head->next; 
         
         // 3. Bebaskan memori node yang disimpan tadi
-        delete hapus;      
+        delete hapus;     
     }
 }
 
@@ -239,7 +239,7 @@ string getCurrentTime() {
     string waktu = ctime(&now); 
 
     // 3. Membersihkan karakter newline (\n) dan carriage return (\r) dari string
-    //    (Implementasi manual)
+    //    (Implementasi manual)
     while (!waktu.empty() && (waktu.back() == '\n' || waktu.back() == '\r')) {
         waktu.pop_back(); 
     }
@@ -301,7 +301,7 @@ void clearInput() {
 
 
 // ============================================================================
-//               IMPLEMENTASI CLASS MenuSatpam - Menu Utama (Display Logic)
+//       IMPLEMENTASI CLASS MenuSatpam - Menu Utama (Display Logic)
 // ============================================================================
 
 void MenuSatpam::tampilkanMenu() {
@@ -312,7 +312,7 @@ void MenuSatpam::tampilkanMenu() {
     while (pilihan != 0) {
         // --- Tampilan Header Menu ---
         cout << "\n=================================================\n";
-        cout << "        SISTEM MANAJEMEN SATPAM GEDUNG           \n";
+        cout << "         SISTEM MANAJEMEN SATPAM GEDUNG          \n";
         cout << "=================================================\n";
         
         // --- KELOMPOK 1: TUGAS & KEHADIRAN ---
@@ -431,7 +431,7 @@ void MenuSatpam::tampilkanMenu() {
 }
 
 // ============================================================================
-//               IMPLEMENTASI CLASS MenuSatpam - FITUR-FITUR
+//         IMPLEMENTASI CLASS MenuSatpam - FITUR-FITUR
 // ============================================================================
 
 // ----------------------------------------------------------------------------
@@ -449,7 +449,8 @@ void MenuSatpam::absenKehadiran() {
     
     // 2. Deklarasi variabel input
     string nama;
-    string status;
+    int status_int; // Variabel untuk input 1 atau 0
+    string status_str = ""; // Variabel untuk string status yang akan dicatat
 
     cout << "\n--- PROSES ABSENSI KEHADIRAN ---\n";
     
@@ -457,24 +458,35 @@ void MenuSatpam::absenKehadiran() {
     cout << "Masukkan nama lengkap Satpam: ";
     getline(cin, nama);
 
-    // 4. Ambil input Status
-    cout << "Status Absensi (MASUK / PULANG): ";
-    getline(cin, status);
+    // 4. Ambil input Status (1 atau 0)
+    cout << "Pilih Status Absensi:\n";
+    cout << "  1. MASUK\n";
+    cout << "  0. PULANG\n";
+    cout << "Masukkan pilihan (1/0): ";
     
-    // 5. Konversi status ke huruf kapital untuk konsistensi log (Manual)
-    for (char &c : status) {
-        c = ::toupper(c); 
+    // Loop validasi input
+    while (!(cin >> status_int) || (status_int != 1 && status_int != 0)) {
+        cout << "❌ Input tidak valid! Harap masukkan 1 (MASUK) atau 0 (PULANG): ";
+        clearInput(); // Bersihkan buffer input
+    }
+    clearInput(); // Bersihkan buffer input setelah cin >> int
+
+    // 5. Konversi input integer ke string status
+    if (status_int == 1) {
+        status_str = "MASUK";
+    } else {
+        status_str = "PULANG";
     }
 
     // 6. Dapatkan waktu saat ini
     string waktu = getCurrentTime();
 
     // 7. Tulis data absen ke file
-    file << "[" << status << "] " << nama << " dicatat pada waktu: " << waktu << endl;
+    file << "[" << status_str << "] " << nama << " dicatat pada waktu: " << waktu << endl;
     
     // 8. Tutup file dan berikan konfirmasi
     file.close(); 
-    cout << "✅ Absen berhasil dicatat pada " << waktu << "!\n";
+    cout << "✅ Absen **" << status_str << "** berhasil dicatat pada " << waktu << "!\n";
 }
 
 void MenuSatpam::selesaikanTugas() {
@@ -575,7 +587,7 @@ void MenuSatpam::logPatroli() {
     file << "[PATROLI SELESAI] Waktu: " << getCurrentTime()
          << " | Area: " << area
          << " | Kondisi: " << catatan << endl;
-         
+          
     // 6. Tutup file dan konfirmasi
     file.close();
     cout << "✅ Log Patroli untuk area " << area << " berhasil dicatat.\n";
@@ -643,13 +655,13 @@ void MenuSatpam::cekStatusSistem() {
     // Simulasi status setiap komponen keamanan
     
     // 1. Status Simulasi CCTV
-    cout << "Status CCTV Area Utama & Lobby:  [STATUS: OK ✅, Rekam]\n";
+    cout << "Status CCTV Area Utama & Lobby:  [STATUS: OK ✅, Rekam]\n";
     
     // 2. Status Simulasi Alarm Kebakaran
     cout << "Status Alarm Kebakaran Lantai 5: [STATUS: OK ✅, Siaga]\n";
     
     // 3. Status Simulasi Alarm Banjir
-    cout << "Status Alarm Banjir Basement:    [STATUS: OK ✅, Normal]\n";
+    cout << "Status Alarm Banjir Basement:    [STATUS: OK ✅, Normal]\n";
     
     // 4. Status Simulasi Kontrol Akses
     cout << "Status Kontrol Akses Pintu Server: [STATUS: TERKUNCI ✅]\n";
@@ -658,7 +670,7 @@ void MenuSatpam::cekStatusSistem() {
     cout << "Status Power Backup (UPS/Genset):[STATUS: OK ✅, Baterai 100%]\n";
     
     // 6. Kondisi Lingkungan Simulasi
-    cout << "Kondisi Jaringan Sensor Suhu:    [STATUS: Normal (25°C)]\n";
+    cout << "Kondisi Jaringan Sensor Suhu:    [STATUS: Normal (25°C)]\n";
     
     cout << "------------------------------------------------------\n";
     cout << "Kesimpulan: Semua sistem inti beroperasi dengan Normal. Pertahankan kewaspadaan.\n";
@@ -696,7 +708,8 @@ void MenuSatpam::logKendaraan() {
     // 2. Deklarasi variabel input
     string plat;
     string jenis;
-    string status;
+    int status_int; // Variabel untuk input 1 atau 0
+    string status_str = ""; // Variabel untuk string status yang akan dicatat
 
     cout << "\n--- PENCATATAN KENDARAAN MASUK/KELUAR ---\n";
     
@@ -708,17 +721,33 @@ void MenuSatpam::logKendaraan() {
     cout << "Jenis Kendaraan (Mobil / Motor / Lainnya): ";
     getline(cin, jenis);
 
-    // 5. Ambil input Status Pergerakan
-    cout << "Status Pergerakan (MASUK / KELUAR): ";
-    getline(cin, status);
+    // 5. Ambil input Status Pergerakan (1 atau 0)
+    cout << "Pilih Status Pergerakan:\n";
+    cout << "  1. MASUK\n";
+    cout << "  0. KELUAR\n";
+    cout << "Masukkan pilihan (1/0): ";
 
-    // 6. Tulis log ke file
-    file << "[" << getCurrentTime() << "][" << status << "] Plat: " 
+    // Loop validasi input
+    while (!(cin >> status_int) || (status_int != 1 && status_int != 0)) {
+        cout << "❌ Input tidak valid! Harap masukkan 1 (MASUK) atau 0 (KELUAR): ";
+        clearInput(); // Bersihkan buffer input
+    }
+    clearInput(); // Bersihkan buffer input setelah cin >> int
+
+    // 6. Konversi input integer ke string status
+    if (status_int == 1) {
+        status_str = "MASUK";
+    } else {
+        status_str = "KELUAR";
+    }
+    
+    // 7. Tulis log ke file
+    file << "[" << getCurrentTime() << "][" << status_str << "] Plat: " 
          << plat << " | Jenis: " << jenis << endl;
-         
-    // 7. Tutup file dan konfirmasi
+          
+    // 8. Tutup file dan konfirmasi
     file.close();
-    cout << "✅ Data kendaraan berhasil dicatat.\n";
+    cout << "✅ Data kendaraan **" << status_str << "** berhasil dicatat.\n";
 }
 
 void MenuSatpam::lihatLogKendaraan() {
@@ -996,5 +1025,5 @@ void MenuSatpam::pengaturanProfil() {
     file.close();
 
     // 8. Konfirmasi
-    cout << "✅ Profil satpam berhasil disimpan dan diperbarui.\n";
+    cout << "✅ Profil satpam  berhasil disimpan dan diperbarui.\n";
 }
