@@ -28,7 +28,7 @@ public:
     void absenMasuk();
     void tampilAbsenSendiri(int idCari);
     void absenKeluar();
-    void simpankeFile();
+    void simpankeFile(); // Sesuai deklarasi Anda (k kecil)
     void loadDariFile();
 };
 
@@ -41,6 +41,7 @@ struct laporan {
     string laporanHariIni;
     laporan* next;
 
+    // Constructor ini yang diimplementasikan di .cpp
     laporan(int _id, string _t, string _j, string _l, string _h);
 };
 
@@ -48,7 +49,7 @@ struct laporan {
 class MenuOb {
 private:
     laporan* head;
-    AbsenOb absen;
+    AbsenOb absen; // Komposisi class AbsenOb
 
 public:
     MenuOb();
@@ -68,6 +69,13 @@ public:
     void selesaikanTugas();
 
     void tampilkanMenu();
+      // Fitur Queue Tugas
+    void lihatTugasSaya();
+    void selesaikanTugas();
+    
+    void tampilkanMenu();
 };
 
-#endif // MENU_OB_H
+  
+#endif
+
