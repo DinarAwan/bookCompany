@@ -7,50 +7,77 @@
 
 using namespace std;
 
-// ===================== KONFIGURASI QUEUE TUGAS (DARI ADMIN) =====================
+// ===================== KONFIGURASI QUEUE (LINKED LIST) =====================
 const string FILE_TUGAS_OB = "tugas_ob.txt";
-const int MAX_QUEUE = 5;
-string queueOb[MAX_QUEUE];
-int front = -1;
-int rear = -1;
 
-// ===================== QUEUE: LOAD DAN SAVE HELPER =====================
-void muatAntrian() {
+struct NodeTugas {
+    string deskripsi;
+    NodeTugas* next;
+};
+
+// Variabel STATIC agar tidak bentrok dengan MenuAdmin.cpp
+static NodeTugas* front = nullptr;
+static NodeTugas* rear = nullptr;
+
+// ===================== HELPER QUEUE (LOAD & SAVE) =====================
+
+// Tambahkan 'static' di depan fungsi-fungsi ini:
+
+// Helper: Bersihkan memori linked list sebelum reload
+static void bersihkanQueue() {
+    while (front != nullptr) {
+        NodeTugas* temp = front;
+        front = front->next;
+        delete temp;
+    }
+    rear = nullptr;
+}
+
+// Helper: Masukkan data ke Linked List (di memori)
+static void enqueueLinkedList(string tugas) {
+    NodeTugas* baru = new NodeTugas;
+    baru->deskripsi = tugas;
+    baru->next = nullptr;
+
+    if (front == nullptr) {
+        front = rear = baru;
+    } else {
+        rear->next = baru;
+        rear = baru;
+    }
+}
+
+// Baca file -> Masukkan ke Linked List
+static void muatAntrian() {
+    bersihkanQueue(); // Reset agar tidak duplikat
     ifstream file(FILE_TUGAS_OB);
     string line;
 
-    front = -1;
-    rear = -1;
-
     while (getline(file, line)) {
         if (!line.empty()) {
-            if (front == -1) front = 0;
-            rear = (rear + 1) % MAX_QUEUE;
-            queueOb[rear] = line;
+            enqueueLinkedList(line);
         }
     }
     file.close();
 }
 
-void simpanAntrian() {
+// Tulis Linked List -> Timpa ke File
+static void simpanAntrian() {
     ofstream file(FILE_TUGAS_OB, ios::trunc);
-
-    if (front == -1) {
-        file.close();
-        return;
-    }
-
-    int i = front;
-    while (true) {
-        file << queueOb[i] << "\n";
-        if (i == rear) break;
-        i = (i + 1) % MAX_QUEUE;
+    
+    NodeTugas* temp = front;
+    while (temp != nullptr) {
+        file << temp->deskripsi << "\n";
+        temp = temp->next;
     }
     file.close();
 }
 
+// ... (Sisa kode ke bawah sama persis, tidak perlu diubah) ...
+// ... Mulai dari Implementasi Struct Laporan dst ...
+
 // ===================== IMPLEMENTASI STRUCT LAPORAN =====================
-// Constructor laporan (PENTING: Ini harus ada karena dideklarasikan di .h)
+// Constructor laporan
 laporan::laporan(int _id, string _t, string _j, string _l, string _h) {
     id = _id;
     tanggal = _t;
@@ -153,7 +180,6 @@ void AbsenOb::absenKeluar() {
     bool ditemukan = false;
 
     do {
-        // Cek ID dan pastikan tanggalnya hari ini
         if (temp->id == idCari && temp->tanggal == ambilTanggalSekarang()) {
             ditemukan = true;
 
@@ -213,14 +239,13 @@ void AbsenOb::loadDariFile() {
         size_t p3 = line.find('|', p2 + 1);
         size_t p4 = line.find('|', p3 + 1);
 
-        // Validasi parsing agar tidak error jika format file rusak
         if (p1 == string::npos || p2 == string::npos || p3 == string::npos || p4 == string::npos) continue;
 
         int id = stoi(line.substr(0, p1));
         string nama = line.substr(p1 + 1, p2 - p1 - 1);
         string tanggal = line.substr(p2 + 1, p3 - p2 - 1);
         string masuk = line.substr(p3 + 1, p4 - p3 - 1);
-        string keluar = line.substr(p4 + 1, line.find('|', p4 + 1) - p4 - 1); // fix parsing last element
+        string keluar = line.substr(p4 + 1, line.find('|', p4 + 1) - p4 - 1);
 
         Absen* baru = new Absen{id, nama, tanggal, masuk, keluar, nullptr};
 
@@ -268,7 +293,6 @@ void MenuOb::loadDariFile() {
         string lama = line.substr(p3+1, p4-p3-1);
         string lap = line.substr(p4+1, line.find('|', p4 + 1) - p4 - 1);
 
-        // Menggunakan constructor struct laporan
         laporan* baru = new laporan(id, tanggal, jenis, lama, lap);
 
         if (head == nullptr)
@@ -291,8 +315,8 @@ void MenuOb::simpanKeFile() {
     while (temp != nullptr) {
         file << temp->id << "|"
              << temp->tanggal << "|"
-             << temp->jenis << "|"     // Menggunakan nama var 'jenis' sesuai .h
-             << temp->lama << "|"      // Menggunakan nama var 'lama' sesuai .h
+             << temp->jenis << "|"
+             << temp->lama << "|"
              << temp->laporanHariIni << "|\n";
         temp = temp->next;
     }
@@ -419,45 +443,54 @@ void MenuOb::laporKerusakanFasilitas() {
     }
 }
 
-// ===================== QUEUE TUGAS (INTEGRASI ADMIN) =====================
+// ===================== QUEUE TUGAS (LINKED LIST IMPLEMENTATION) =====================
 
 void MenuOb::lihatTugasSaya() {
-    if (front == -1) {
+    // Cek apakah Linked List kosong
+    if (front == nullptr) {
         cout << "[INFO] Tidak ada tugas. Anda bisa bersantai!\n";
         return;
     }
 
-    cout << "\n=== Daftar Tugas Yang Harus Dikerjakan (FIFO) ===\n";
-    int i = front;
+    cout << "\n=== Daftar Tugas Yang Harus Dikerjakan (FIFO - Linked List) ===\n";
+    
+    NodeTugas* temp = front;
     int urutan = 1;
-    while (true) {
-        if (i == front) cout << "[PRIORITAS] ";
+    
+    while (temp != nullptr) {
+        if (urutan == 1) cout << "[PRIORITAS] ";
         else cout << "            ";
 
-        cout << "Tugas " << urutan++ << ": " << queueOb[i] << endl;
-
-        if (i == rear) break;
-        i = (i + 1) % MAX_QUEUE;
+        cout << "Tugas " << urutan++ << ": " << temp->deskripsi << endl;
+        temp = temp->next;
     }
 }
 
 void MenuOb::selesaikanTugas() {
-    if (front == -1) {
+    // Cek Underflow (Apakah linked list kosong?)
+    if (front == nullptr) {
         cout << "[INFO] Tidak ada tugas untuk diselesaikan.\n";
         return;
     }
 
-    string tugasSelesai = queueOb[front];
+    // Ambil data dari node paling depan (Front)
+    NodeTugas* temp = front;
+    string tugasSelesai = temp->deskripsi;
 
-    // Logika Circular Dequeue
-    if (front == rear) {
-        front = -1;
-        rear = -1;
-    } else {
-        front = (front + 1) % MAX_QUEUE;
+    // Geser Front ke node berikutnya
+    front = front->next;
+
+    // Jika setelah digeser Front jadi null, maka Rear juga harus null
+    if (front == nullptr) {
+        rear = nullptr;
     }
 
+    // Hapus node lama dari memori
+    delete temp;
+
+    // Simpan perubahan ke file
     simpanAntrian();
+
     cout << "\n[SUKSES] Anda telah menyelesaikan tugas:\n";
     cout << ">>> \"" << tugasSelesai << "\" <<<\n";
     cout << "Tugas dihapus dari daftar antrian.\n";
@@ -466,7 +499,7 @@ void MenuOb::selesaikanTugas() {
 // ===================== MAIN MENU =====================
 
 void MenuOb::tampilkanMenu() {
-    // Sinkronisasi tugas dari file saat menu dibuka
+    // Sinkronisasi tugas dari file ke Linked List saat menu dibuka
     muatAntrian();
 
     int pilihan;
@@ -477,7 +510,7 @@ void MenuOb::tampilkanMenu() {
         cout << "3. Hapus Laporan Harian\n";
         cout << "4. Lapor Kerusakan Fasilitas\n";
         cout << "5. Absen Masuk\n";
-        cout << "6. Absen Keluar\n"; // Menambahkan opsi Absen Keluar
+        cout << "6. Absen Keluar\n"; 
         cout << "7. Lihat Data Absen\n";
         cout << "8. Lihat Daftar Tugas (Dari Admin)\n";
         cout << "9. Selesaikan Tugas (Dequeue)\n";
