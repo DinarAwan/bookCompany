@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+
 using namespace std;
 
 // ===================== ABSENSI OB =====================
@@ -31,7 +32,7 @@ public:
     void loadDariFile();
 };
 
-// ===================== STRUCT LAPORAN =====================
+// ===================== LAPORAN PEKERJAAN =====================
 struct laporan {
     int id;
     string tanggal;
@@ -59,7 +60,14 @@ public:
     void lihatLaporan();
     void hapusLaporan();
     void laporKerusakanFasilitas();
+
+    // Fitur antrian tugas dari admin
+    void muatAntrian();      // load queue dari file
+    void simpanAntrian();    // simpan queue ke file
+    void lihatTugasSaya();
+    void selesaikanTugas();
+
     void tampilkanMenu();
 };
 
-#endif
+#endif // MENU_OB_H
