@@ -48,6 +48,49 @@ struct Visitor {
 // ============================================================================
 //                          FUNGSI PENDUKUNG LINKED LIST
 // ============================================================================
+// ============================================================================
+//                      STRUKTUR DATA QUEUE UNTUK ABSEN
+// ============================================================================
+struct AbsenNode {
+    string data;
+    AbsenNode* next;
+};
+
+struct AbsenQueue {
+    AbsenNode* front;
+    AbsenNode* rear;
+    AbsenQueue() : front(NULL), rear(NULL) {}
+};
+
+void enqueue(AbsenQueue &q, const string &data) {
+    AbsenNode* baru = new AbsenNode{data, NULL};
+    if (q.rear == NULL) {
+        q.front = q.rear = baru;
+    } else {
+        q.rear->next = baru;
+        q.rear = baru;
+    }
+}
+
+void clearQueue(AbsenQueue &q) {
+    while (q.front != NULL) {
+        AbsenNode* hapus = q.front;
+        q.front = q.front->next;
+        delete hapus;
+    }
+    q.rear = NULL;
+}
+
+void tampilkanQueue(const AbsenQueue &q) {
+    AbsenNode* temp = q.front;
+    int i = 1;
+    cout << "---------------------------------------------------------\n";
+    while (temp != NULL) {
+        cout << "[" << setw(3) << right << i++ << "] " << temp->data << endl;
+        temp = temp->next;
+    }
+    cout << "---------------------------------------------------------\n";
+}
 
 /**
  * @brief Membuat node pengunjung baru.
@@ -511,8 +554,25 @@ void MenuSatpam::selesaikanTugas() {
 }
 
 void MenuSatpam::lihatLogAbsen() {
-    // Tampilkan isi file Absen
-    tampilkanIsiFile(FILE_ABSEN_SATPAM, "LOG RIWAYAT KEHADIRAN (ABSENSI)");
+    // Tampilkan isi file Absen menggunakan queue (single linked list)
+    ifstream file(FILE_ABSEN_SATPAM);
+    cout << "\n=== LOG RIWAYAT KEHADIRAN (ABSENSI) ===\n";
+    if (!file.is_open()) {
+        cout << "Belum ada data di " << FILE_ABSEN_SATPAM << ". File tidak ditemukan.\n";
+        return;
+    }
+    AbsenQueue q;
+    string baris;
+    while (getline(file, baris)) {
+        if (!baris.empty()) enqueue(q, baris);
+    }
+    file.close();
+    if (q.front == NULL) {
+        cout << "Belum ada data absen yang dicatat.\n";
+    } else {
+        tampilkanQueue(q);
+    }
+    clearQueue(q);
 }
 
 void MenuSatpam::lihatLaporanSelesai() {
