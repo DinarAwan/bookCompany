@@ -9,16 +9,16 @@ using namespace std;
 
 // ===================== KONFIGURASI QUEUE TUGAS (DARI ADMIN) =====================
 const string FILE_TUGAS_OB = "tugas_ob.txt";
-const int MAX_QUEUE = 5; 
+const int MAX_QUEUE = 5;
 string queueOb[MAX_QUEUE];
 int front = -1;
 int rear = -1;
 
-// --- FUNGSI BANTUAN QUEUE: SINKRONISASI ---
+// ===================== QUEUE: LOAD DAN SAVE HELPER =====================
 void muatAntrian() {
     ifstream file(FILE_TUGAS_OB);
     string line;
-    
+
     front = -1;
     rear = -1;
 
@@ -34,21 +34,34 @@ void muatAntrian() {
 
 void simpanAntrian() {
     ofstream file(FILE_TUGAS_OB, ios::trunc);
-    
-    if (front == -1) { 
-        file.close(); return; 
+
+    if (front == -1) {
+        file.close();
+        return;
     }
 
     int i = front;
     while (true) {
         file << queueOb[i] << "\n";
         if (i == rear) break;
-        i = (i + 1) % MAX_QUEUE; 
+        i = (i + 1) % MAX_QUEUE;
     }
     file.close();
 }
 
-// ===================== IMPLEMENTASI ABSEN OB =====================
+// ===================== IMPLEMENTASI STRUCT LAPORAN =====================
+// Constructor laporan (PENTING: Ini harus ada karena dideklarasikan di .h)
+laporan::laporan(int _id, string _t, string _j, string _l, string _h) {
+    id = _id;
+    tanggal = _t;
+    jenis = _j;
+    lama = _l;
+    laporanHariIni = _h;
+    next = nullptr;
+}
+
+// ===================== IMPLEMENTASI CLASS AbsenOb =====================
+
 AbsenOb::AbsenOb() {
     head = nullptr;
 }
@@ -72,9 +85,11 @@ string AbsenOb::ambilTanggalSekarang() {
 void AbsenOb::absenMasuk() {
     int id;
     string nama;
+
     cout << "Masukkan ID OB: ";
     cin >> id;
     cin.ignore();
+
     cout << "Masukkan nama OB: ";
     getline(cin, nama);
 
@@ -86,17 +101,17 @@ void AbsenOb::absenMasuk() {
 
     if (head == nullptr) {
         head = baru;
-        head->next = head; // circular list
+        head->next = head; // circular list logic
     } else {
         Absen* temp = head;
-        while (temp->next != head) {
+        while (temp->next != head)
             temp = temp->next;
-        }
         temp->next = baru;
         baru->next = head;
     }
 
-    cout << nama << " berhasil absen masuk pada " << tanggal << " pukul " << waktuMasuk << endl;
+    cout << "✅ " << nama << " berhasil absen masuk pada " << tanggal << " pukul " << waktuMasuk << endl;
+    simpankeFile();
 }
 
 void AbsenOb::tampilAbsenSendiri(int idCari) {
@@ -110,7 +125,7 @@ void AbsenOb::tampilAbsenSendiri(int idCari) {
 
     do {
         if (temp->id == idCari) {
-            cout << "\n===== Data Absensi Anda =====\n";
+            cout << "\n===== Data Absensi =====\n";
             cout << "ID           : " << temp->id << endl;
             cout << "Nama         : " << temp->nama << endl;
             cout << "Tanggal      : " << temp->tanggal << endl;
@@ -125,25 +140,111 @@ void AbsenOb::tampilAbsenSendiri(int idCari) {
         cout << "Belum ada data absensi untuk ID tersebut.\n";
 }
 
-// ===================== IMPLEMENTASI MENU OB =====================
+void AbsenOb::absenKeluar() {
+    int idCari;
+    if (head == nullptr) {
+        cout << "Belum ada data absensi.\n";
+        return;
+    }
+
+    cout << "Masukkan ID anda untuk Absen Keluar: ";
+    cin >> idCari;
+    Absen* temp = head;
+    bool ditemukan = false;
+
+    do {
+        // Cek ID dan pastikan tanggalnya hari ini
+        if (temp->id == idCari && temp->tanggal == ambilTanggalSekarang()) {
+            ditemukan = true;
+
+            if (temp->waktuKeluar != "-") {
+                cout << "Anda sudah absen keluar hari ini pada pukul " << temp->waktuKeluar << endl;
+                return;
+            }
+
+            temp->waktuKeluar = ambilWaktuSekarang();
+            cout << "✅ Anda berhasil absen keluar pada pukul " << temp->waktuKeluar << endl;
+            simpankeFile();
+            return;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    if (!ditemukan)
+        cout << "Data absen masuk hari ini tidak ditemukan untuk ID tersebut.\n";
+}
+
+void AbsenOb::simpankeFile() {
+    ofstream file("absenOb.txt");
+
+    if (!file.is_open()) {
+        cout << "Gagal menyimpan data absen\n";
+        return;
+    }
+
+    if (head == nullptr) {
+        file.close();
+        return;
+    }
+
+    Absen* temp = head;
+    do {
+        file << temp->id << "|"
+             << temp->nama << "|"
+             << temp->tanggal << "|"
+             << temp->waktuMasuk << "|"
+             << temp->waktuKeluar << "|\n";
+        temp = temp->next;
+    } while (temp != head);
+
+    file.close();
+}
+
+void AbsenOb::loadDariFile() {
+    ifstream file("absenOb.txt");
+    if (!file.is_open()) return;
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+
+        // Validasi parsing agar tidak error jika format file rusak
+        if (p1 == string::npos || p2 == string::npos || p3 == string::npos || p4 == string::npos) continue;
+
+        int id = stoi(line.substr(0, p1));
+        string nama = line.substr(p1 + 1, p2 - p1 - 1);
+        string tanggal = line.substr(p2 + 1, p3 - p2 - 1);
+        string masuk = line.substr(p3 + 1, p4 - p3 - 1);
+        string keluar = line.substr(p4 + 1, line.find('|', p4 + 1) - p4 - 1); // fix parsing last element
+
+        Absen* baru = new Absen{id, nama, tanggal, masuk, keluar, nullptr};
+
+        if (head == nullptr) {
+            head = baru;
+            head->next = head;
+        } else {
+            Absen* temp = head;
+            while (temp->next != head)
+                temp = temp->next;
+            temp->next = baru;
+            baru->next = head;
+        }
+    }
+    file.close();
+}
+
+// ===================== IMPLEMENTASI CLASS MenuOb =====================
+
 MenuOb::MenuOb() {
     head = nullptr;
     loadDariFile();
-    // Tidak perlu muatAntrian() disini karena akan dipanggil di tampilkanMenu()
-}
-
-void MenuOb::simpanKeFile() {
-    ofstream file("laporan.txt");
-    laporan* temp = head;
-    while (temp != nullptr) {
-        file << temp->id << "|"
-             << temp->tanggal << "|"
-             << temp->JenisPekerjaan << "|"
-             << temp->LamaPekerjaan << "|"
-             << temp->laporanHariIni << "|\n";
-        temp = temp->next;
-    }
-    file.close();
+    // Muat data absen juga saat MenuOb dibuat
+    absen.loadDariFile();
 }
 
 void MenuOb::loadDariFile() {
@@ -154,19 +255,22 @@ void MenuOb::loadDariFile() {
     while (getline(file, line)) {
         if (line.empty()) continue;
 
-        size_t pos1 = line.find('|');
-        size_t pos2 = line.find('|', pos1 + 1);
-        size_t pos3 = line.find('|', pos2 + 1);
-        size_t pos4 = line.find('|', pos3 + 1);
-        size_t pos5 = line.find('|', pos4 + 1);
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1+1);
+        size_t p3 = line.find('|', p2+1);
+        size_t p4 = line.find('|', p3+1);
 
-        int id = stoi(line.substr(0, pos1));
-        string tanggal = line.substr(pos1 + 1, pos2 - pos1 - 1);
-        string jenis = line.substr(pos2 + 1, pos3 - pos2 - 1);
-        string lama = line.substr(pos3 + 1, pos4 - pos3 - 1);
-        string laporanHarian = line.substr(pos4 + 1, pos5 - pos4 - 1);
+        if (p1 == string::npos || p2 == string::npos || p3 == string::npos || p4 == string::npos) continue;
 
-        laporan* baru = new laporan(id, tanggal, jenis, lama, laporanHarian);
+        int id = stoi(line.substr(0, p1));
+        string tanggal = line.substr(p1+1, p2-p1-1);
+        string jenis = line.substr(p2+1, p3-p2-1);
+        string lama = line.substr(p3+1, p4-p3-1);
+        string lap = line.substr(p4+1, line.find('|', p4 + 1) - p4 - 1);
+
+        // Menggunakan constructor struct laporan
+        laporan* baru = new laporan(id, tanggal, jenis, lama, lap);
+
         if (head == nullptr)
             head = baru;
         else {
@@ -176,6 +280,23 @@ void MenuOb::loadDariFile() {
             temp->next = baru;
         }
     }
+
+    file.close();
+}
+
+void MenuOb::simpanKeFile() {
+    ofstream file("laporan.txt");
+
+    laporan* temp = head;
+    while (temp != nullptr) {
+        file << temp->id << "|"
+             << temp->tanggal << "|"
+             << temp->jenis << "|"     // Menggunakan nama var 'jenis' sesuai .h
+             << temp->lama << "|"      // Menggunakan nama var 'lama' sesuai .h
+             << temp->laporanHariIni << "|\n";
+        temp = temp->next;
+    }
+
     file.close();
 }
 
@@ -191,20 +312,20 @@ int MenuOb::getNextId() {
 
 void MenuOb::tambahLaporan() {
     int id = getNextId();
-    cin.ignore(); // Bersihkan buffer sebelum getline
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    string tanggal, jenis, lama, laporanHarian;
+    string tanggal, jenis, lama, laporanHari;
 
-    cout << "Masukkan tanggal (DD-MM-YYYY): ";
+    cout << "Tanggal (YYYY-MM-DD): ";
     getline(cin, tanggal);
-    cout << "Masukkan jenis pekerjaan: ";
+    cout << "Jenis pekerjaan: ";
     getline(cin, jenis);
-    cout << "Masukkan lama pekerjaan: ";
+    cout << "Lama pekerjaan: ";
     getline(cin, lama);
-    cout << "Masukkan laporan hari ini: ";
-    getline(cin, laporanHarian);
+    cout << "Laporan hari ini: ";
+    getline(cin, laporanHari);
 
-    laporan* baru = new laporan(id, tanggal, jenis, lama, laporanHarian);
+    laporan* baru = new laporan(id, tanggal, jenis, lama, laporanHari);
 
     if (head == nullptr)
         head = baru;
@@ -230,8 +351,8 @@ void MenuOb::lihatLaporan() {
     while (temp != nullptr) {
         cout << "ID        : " << temp->id << endl;
         cout << "Tanggal   : " << temp->tanggal << endl;
-        cout << "Jenis     : " << temp->JenisPekerjaan << endl;
-        cout << "Lama      : " << temp->LamaPekerjaan << endl;
+        cout << "Jenis     : " << temp->jenis << endl;
+        cout << "Lama      : " << temp->lama << endl;
         cout << "Laporan   : " << temp->laporanHariIni << endl;
         cout << "--------------------------------------\n";
         temp = temp->next;
@@ -247,6 +368,7 @@ void MenuOb::hapusLaporan() {
     int idHapus;
     cout << "Masukkan ID laporan yang ingin dihapus: ";
     cin >> idHapus;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     laporan* temp = head;
     laporan* prev = nullptr;
@@ -270,7 +392,7 @@ void MenuOb::hapusLaporan() {
         simpanKeFile();
         cout << "✅ Laporan berhasil dihapus!\n";
     } else {
-        cout << "❌ Laporan dengan ID tersebut tidak ditemukan.\n";
+        cout << "❌ ID laporan tidak ditemukan!\n";
     }
 }
 
@@ -291,13 +413,13 @@ void MenuOb::laporKerusakanFasilitas() {
     if (file.is_open()) {
         file << id << "|" << namaFasilitas << "|" << deskripsi << "|\n";
         file.close();
-        cout << "✅ Laporan kerusakan fasilitas berhasil dikirim!\n";
+        cout << "✅ Laporan fasilitas berhasil dikirim!\n";
     } else {
         cout << "❌ Gagal membuka file laporan fasilitas.\n";
     }
 }
 
-// ===================== FITUR BARU: QUEUE TUGAS =====================
+// ===================== QUEUE TUGAS (INTEGRASI ADMIN) =====================
 
 void MenuOb::lihatTugasSaya() {
     if (front == -1) {
@@ -311,7 +433,7 @@ void MenuOb::lihatTugasSaya() {
     while (true) {
         if (i == front) cout << "[PRIORITAS] ";
         else cout << "            ";
-        
+
         cout << "Tugas " << urutan++ << ": " << queueOb[i] << endl;
 
         if (i == rear) break;
@@ -321,13 +443,13 @@ void MenuOb::lihatTugasSaya() {
 
 void MenuOb::selesaikanTugas() {
     if (front == -1) {
-        cout << "[INFO] Antrian kosong! Tidak ada tugas untuk diselesaikan.\n";
+        cout << "[INFO] Tidak ada tugas untuk diselesaikan.\n";
         return;
     }
 
     string tugasSelesai = queueOb[front];
 
-    // Logika Dequeue
+    // Logika Circular Dequeue
     if (front == rear) {
         front = -1;
         rear = -1;
@@ -335,38 +457,39 @@ void MenuOb::selesaikanTugas() {
         front = (front + 1) % MAX_QUEUE;
     }
 
-    simpanAntrian(); // Simpan perubahan ke file
-
+    simpanAntrian();
     cout << "\n[SUKSES] Anda telah menyelesaikan tugas:\n";
     cout << ">>> \"" << tugasSelesai << "\" <<<\n";
     cout << "Tugas dihapus dari daftar antrian.\n";
 }
 
-// ===================== MAIN MENU LOOP =====================
+// ===================== MAIN MENU =====================
 
 void MenuOb::tampilkanMenu() {
-    // PENTING: Muat tugas setiap kali menu dibuka agar sinkron dengan Admin
+    // Sinkronisasi tugas dari file saat menu dibuka
     muatAntrian();
 
     int pilihan;
     do {
-        cout << "\n========== MENU OB ==========\n";
-        cout << "1. Tambah laporan Harian\n";
-        cout << "2. Lihat laporan Harian\n";
-        cout << "3. Hapus laporan Harian\n";
+        cout << "\n========== MENU PETUGAS KEBERSIHAN (OB) ==========\n";
+        cout << "1. Tambah Laporan Harian\n";
+        cout << "2. Lihat Laporan Harian\n";
+        cout << "3. Hapus Laporan Harian\n";
         cout << "4. Lapor Kerusakan Fasilitas\n";
         cout << "5. Absen Masuk\n";
-        cout << "6. Lihat Data Absen\n";
-        cout << "7. Lihat Daftar Tugas (Dari Admin)\n"; // MENU BARU
-        cout << "8. Selesaikan Tugas (Dequeue)\n";    // MENU BARU
+        cout << "6. Absen Keluar\n"; // Menambahkan opsi Absen Keluar
+        cout << "7. Lihat Data Absen\n";
+        cout << "8. Lihat Daftar Tugas (Dari Admin)\n";
+        cout << "9. Selesaikan Tugas (Dequeue)\n";
         cout << "0. Logout\n";
         cout << "Pilih menu: ";
-        
+
         while (!(cin >> pilihan)) {
             cout << "Input tidak valid. Masukkan angka: ";
-            cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Bersihkan newline
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (pilihan) {
             case 1: tambahLaporan(); break;
@@ -374,17 +497,19 @@ void MenuOb::tampilkanMenu() {
             case 3: hapusLaporan(); break;
             case 4: laporKerusakanFasilitas(); break;
             case 5: absen.absenMasuk(); break;
-            case 6: {
+            case 6: absen.absenKeluar(); break;
+            case 7: {
                 int idCari;
-                cout << "Masukkan ID Anda untuk melihat data absen: ";
+                cout << "Masukkan ID Anda: ";
                 cin >> idCari;
                 absen.tampilAbsenSendiri(idCari);
                 break;
             }
-            case 7: lihatTugasSaya(); break; // Panggil fungsi queue
-            case 8: selesaikanTugas(); break; // Panggil fungsi queue
+            case 8: lihatTugasSaya(); break;
+            case 9: selesaikanTugas(); break;
             case 0: cout << "Logout berhasil!\n"; break;
             default: cout << "Pilihan tidak valid!\n";
         }
+
     } while (pilihan != 0);
 }
