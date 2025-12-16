@@ -1,5 +1,7 @@
 #include "MenuSuperAdmin.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 BinarySearchTree::BinarySearchTree() {
@@ -18,11 +20,16 @@ Node* BinarySearchTree::tambahdata(Node* root, karyawan kar) {
     if (root == NULL) {
         return buatNode(kar);
     }
-    if (kar.id < root->data.id) {
-        root->left = tambahdata(root->left, kar);
-    } else {
-        root->right = tambahdata(root->right, kar);
-    }
+
+     if (kar.id < root->data.id) {
+            root->left = tambahdata(root->left, kar);
+        } 
+        else if (kar.id > root->data.id) {
+            root->right = tambahdata(root->right, kar);
+        } 
+        else {
+            cout << "ID karyawan sudah ada!\n";
+        }
     return root;
 }
 
@@ -41,6 +48,7 @@ Node* BinarySearchTree::search(Node* root, int id) {
     }
 }
 
+//binary search tree inorder
 void BinarySearchTree::inorder(Node* root) {
     if (!root) return;
         inorder(root->left);
@@ -69,7 +77,6 @@ void SuperAdmin::tambahKaryawan() {
 }
 
 void SuperAdmin::tampilkanKaryawan() {
-    cout << "\n=== Daftar Karyawan ===\n";
     tree.inorder(tree.root);
 }
 
@@ -87,6 +94,55 @@ void SuperAdmin::cariKaryawan() {
         cout << "Karyawan dengan ID " << idCari << " tidak ditemukan.\n";
     }
 }
+
+//simpan ke file
+void  BinarySearchTree::simpankefile(Node *root, ofstream &file) {
+  if (!root) return;
+    simpankefile(root->left, file);
+
+    file << root->data.id << "|"
+         << root->data.nama << "|"
+         << root->data.role << endl;
+
+    simpankefile(root->right, file);
+
+}
+
+void SuperAdmin::simpanKaryawanKeFile(const string &filekaryawan) {
+    ofstream file(filekaryawan);
+    if (!file.is_open()) {
+        cout << "Gagal membuka file untuk menyimpan data karyawan.\n";
+        return;
+    }
+
+    tree.simpankefile(tree.root, file);
+    file.close();
+    cout << "Data karyawan berhasil disimpan ke " << filekaryawan << endl;
+}
+
+void SuperAdmin::loadKaryawanDariFile(const string &filekaryawan) {
+    string line;
+    karyawan kar;
+    string idtostr;
+
+    ifstream file(filekaryawan);
+    if (!file.is_open()) {
+        cout << "Gagal membuka file untuk memuat data karyawan.\n";
+        return;
+    }
+
+    while (getline(file, line)){
+        stringstream ss(line);
+        getline(ss, idtostr, '|');
+        getline(ss, kar.nama, '|');
+        getline(ss, kar.role, '|');
+        kar.id = stoi(idtostr);
+        tree.tambahDataKaryawan(kar);
+    }
+     file.close();
+     cout << "Data karyawan berhasil dimuat dari " << filekaryawan << endl;
+}
+
 
 void MenuSuperAdmin::tampilkanMenu() {
     
@@ -111,6 +167,7 @@ void MenuSuperAdmin::tampilkanMenu() {
                Sadmin.cariKaryawan();
                 break;
             case 0:
+                 Sadmin.simpanKaryawanKeFile("karyawan.txt"); //langsung save ke file saat logout
                 cout << "Logout berhasil!\n";
                 break;
             default:
@@ -119,4 +176,3 @@ void MenuSuperAdmin::tampilkanMenu() {
         cout << endl;
     } while (pilihan != 0);
 }
-
