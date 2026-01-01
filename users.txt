@@ -1,0 +1,8 @@
+3201011111111111|Super Admin|1-1-1990|1|Jakarta|1|2|Administrator|1|2|super123
+3201012222222222|Admin Toko|15-5-1985|1|Bandung|1|2|Admin|1|1|admin123
+3201013333333333|Pengguna Biasa|20-8-2000|2|Surabaya|2|1|Mahasiswa|1|3|user123
+3201014444444444|Budi Satpam|10-3-1988|1|Semarang|1|2|Satpam|1|4|satpam123
+3201015555555555|Ani Karyawan|25-12-1992|2|Yogyakarta|3|2|Librarian|1|5|karyawan123
+3201016666666666|Dedi Kasir|5-7-1995|1|Malang|1|1|Kasir|1|6|kasir123
+3201017777777777|Eko OB|18-9-1993|1|Solo|1|2|Office Boy|1|7|ob123
+987654321|Dinar Ganteng Banget|22-21-2022|1|Randu BwlaNG|1|1|Mahsiswa|1|7|0987654321

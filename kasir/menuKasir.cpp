@@ -1,7 +1,6 @@
 #include "menuKasir.h"
 #include <iostream>
 #include <fstream>
-#include <limits>
 #include <string>
 
 using namespace std;
@@ -20,29 +19,26 @@ struct Buku {
 // --- STRUKTUR UNTUK STACK (HISTORI) ---
 struct Riwayat {
     string judulBuku;
-    string aktivitas; // Contoh: "Dipinjam" atau "Dikembalikan"
+    string aktivitas;
 };
 
 class ManajemenBukuKasir {
 private:
-    Buku* bukuDaftar;
-    int jumlahBuku;
-    int kapasitas;
+    // ========== SINGLE LINKED LIST UNTUK BUKU ==========
+    struct NodeBuku {
+        Buku data;
+        NodeBuku* next;
+    };
 
-    // --- VARIABEL STACK ARRAY ---
-    static const int MAX_STACK = 50; // Maksimal histori yang disimpan sementara
-    Riwayat stackRiwayat[MAX_STACK]; // Array untuk stack
-    int top; // Penunjuk elemen teratas
+    NodeBuku* head;
 
-    void perbesarKapasitas() {
-        kapasitas *= 2;
-        Buku* bukuBaru = new Buku[kapasitas];
-        for (int i = 0; i < jumlahBuku; i++) {
-            bukuBaru[i] = bukuDaftar[i];
-        }
-        delete[] bukuDaftar;
-        bukuDaftar = bukuBaru;
-    }
+    // ========== SINGLE LINKED LIST UNTUK STACK HISTORI ==========
+    struct NodeRiwayat {
+        Riwayat data;
+        NodeRiwayat* next;
+    };
+
+    NodeRiwayat* topStack;
 
     void muatDariFile() {
         ifstream file("buku.txt");
@@ -51,13 +47,13 @@ private:
         while (true) { 
             Buku buku;
             if (!(file >> buku.id)) break; 
-            file.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            file.ignore(1000, '\n'); 
             
             if (!getline(file, buku.judul)) break;
             if (!getline(file, buku.penulis)) break;
             
             if (!(file >> buku.tahun)) break;
-            file.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            file.ignore(1000, '\n'); 
             
             if (!getline(file, buku.isbn)) break;
             if (!getline(file, buku.kategori)) break;
@@ -70,103 +66,195 @@ private:
                 buku.status = "Tersedia";
             }
 
-            if (jumlahBuku >= kapasitas) {
-                perbesarKapasitas();
+            // Tambahkan ke linked list
+            NodeBuku* nodeBaru = new NodeBuku;
+            nodeBaru->data = buku;
+            nodeBaru->next = nullptr;
+
+            if (head == nullptr) {
+                head = nodeBaru;
+            } else {
+                NodeBuku* temp = head;
+                while (temp->next != nullptr) {
+                    temp = temp->next;
+                }
+                temp->next = nodeBaru;
             }
-            bukuDaftar[jumlahBuku++] = buku;
         }
         file.close();
     }
 
     void simpanKeFile() {
         ofstream file("buku.txt", ios::trunc);
-        for (int i = 0; i < jumlahBuku; i++) {
-            file << bukuDaftar[i].id << "\n";
-            file << bukuDaftar[i].judul << "\n";
-            file << bukuDaftar[i].penulis << "\n";
-            file << bukuDaftar[i].tahun << "\n";
-            file << bukuDaftar[i].isbn << "\n";
-            file << bukuDaftar[i].kategori << "\n";
-            file << bukuDaftar[i].status << "\n"; 
+        NodeBuku* temp = head;
+        while (temp != nullptr) {
+            file << temp->data.id << "\n";
+            file << temp->data.judul << "\n";
+            file << temp->data.penulis << "\n";
+            file << temp->data.tahun << "\n";
+            file << temp->data.isbn << "\n";
+            file << temp->data.kategori << "\n";
+            file << temp->data.status << "\n"; 
+            temp = temp->next;
         }
         file.close();
     }
 
+    // --- FUNGSI MENYIMPAN HISTORI KE TXT ---
+    void simpanHistori() {
+        ofstream file("histori.txt", ios::trunc);
+        if (!file.is_open()) return;
+
+        // Hitung jumlah node di stack
+        int count = 0;
+        NodeRiwayat* temp = topStack;
+        while (temp != nullptr) {
+            count++;
+            temp = temp->next;
+        }
+
+        file << count << "\n";
+
+        // Simpan data dari top ke bottom
+        temp = topStack;
+        while (temp != nullptr) {
+            file << temp->data.judulBuku << "\n";
+            file << temp->data.aktivitas << "\n";
+            temp = temp->next;
+        }
+        file.close();
+    }
+
+    // --- FUNGSI MEMUAT HISTORI DARI TXT ---
+    void muatHistori() {
+        ifstream file("histori.txt");
+        if (!file.is_open()) return;
+
+        int count;
+        if (!(file >> count)) return; 
+        file.ignore(1000, '\n');
+
+        if (count <= 0) {
+            file.close();
+            return;
+        }
+
+        // Baca semua data ke array temporary
+        Riwayat* tempArray = new Riwayat[count];
+        for (int i = 0; i < count; i++) {
+            if (!getline(file, tempArray[i].judulBuku)) {
+                delete[] tempArray;
+                file.close();
+                return;
+            }
+            if (!getline(file, tempArray[i].aktivitas)) {
+                delete[] tempArray;
+                file.close();
+                return;
+            }
+        }
+        file.close();
+
+        // Push dari belakang ke depan agar urutan tetap sama
+        for (int i = count - 1; i >= 0; i--) {
+            NodeRiwayat* nodeBaru = new NodeRiwayat;
+            nodeBaru->data = tempArray[i];
+            nodeBaru->next = topStack;
+            topStack = nodeBaru;
+        }
+
+        delete[] tempArray;
+    }
+
 public:
     ManajemenBukuKasir() {
-        kapasitas = 10;
-        jumlahBuku = 0;
-        bukuDaftar = new Buku[kapasitas];
-        
-        // Inisialisasi Stack
-        top = -1; // Menandakan stack kosong
+        head = nullptr;
+        topStack = nullptr;
         
         muatDariFile(); 
+        muatHistori();
     }
 
     ~ManajemenBukuKasir() {
         simpanKeFile(); 
-        delete[] bukuDaftar;
-    }
-
-    // --- FUNGSI STACK: PUSH (Menambah Histori) ---
-    void pushRiwayat(string judul, string aksi) {
-        if (top >= MAX_STACK - 1) {
-            cout << "[Info] Histori penuh (Stack Overflow), data lama tidak tersimpan." << endl;
-            return;
-        }
+        simpanHistori();
         
-        top++; // Naikkan penunjuk
-        stackRiwayat[top].judulBuku = judul;
-        stackRiwayat[top].aktivitas = aksi;
+        // Hapus semua node buku
+        while (head != nullptr) {
+            NodeBuku* temp = head;
+            head = head->next;
+            delete temp;
+        }
+
+        // Hapus semua node stack
+        while (topStack != nullptr) {
+            NodeRiwayat* temp = topStack;
+            topStack = topStack->next;
+            delete temp;
+        }
     }
 
-    // --- FUNGSI STACK BARU: POP (Menghapus Histori Terakhir) ---
+    // --- FUNGSI STACK: PUSH ---
+    void pushRiwayat(string judul, string aksi) {
+        NodeRiwayat* nodeBaru = new NodeRiwayat;
+        nodeBaru->data.judulBuku = judul;
+        nodeBaru->data.aktivitas = aksi;
+        nodeBaru->next = topStack;
+        topStack = nodeBaru;
+    }
+
+    // --- FUNGSI STACK: POP ---
     void popRiwayat() {
-        // Cek Underflow (Apakah stack kosong?)
-        if (top == -1) {
+        if (topStack == nullptr) {
             cout << "\n[INFO] Histori kosong! Tidak ada record yang bisa di-pop." << endl;
             return;
         }
 
-        // Ambil data sebelum dihapus (hanya untuk ditampilkan ke user)
-        string judulDihapus = stackRiwayat[top].judulBuku;
-        string aksiDihapus = stackRiwayat[top].aktivitas;
+        string judulDihapus = topStack->data.judulBuku;
+        string aksiDihapus = topStack->data.aktivitas;
 
-        // LAKUKAN POP
-        top--; 
+        NodeRiwayat* temp = topStack;
+        topStack = topStack->next;
+        delete temp;
 
         cout << "\n[SUKSES] Menghapus record terakhir dari Stack:" << endl;
         cout << "Buku: " << judulDihapus << " | Status: " << aksiDihapus << endl;
-        cout << "(Catatan: Ini hanya menghapus log histori, status di database buku tetap)." << endl;
+        cout << "(Catatan: Ini menghapus log dari memori dan akan diperbarui di file saat logout)." << endl;
     }
 
-    // --- FUNGSI STACK: DISPLAY (Lihat Histori - LIFO) ---
+    // --- FUNGSI STACK: DISPLAY ---
     void lihatHistori() {
         cout << "============= Histori Aktivitas (Stack LIFO) =============" << endl;
-        if (top == -1) {
-            cout << "Stack Kosong. Belum ada aktivitas sesi ini." << endl;
+        if (topStack == nullptr) {
+            cout << "Stack Kosong. Belum ada aktivitas." << endl;
             return;
         }
 
-        // Loop dari TOP ke 0
-        for (int i = top; i >= 0; i--) {
-            cout << "No. " << (top - i + 1) << " (TOP-" << (top - i) << ") | "; 
-            cout << "Buku: " << stackRiwayat[i].judulBuku << " | ";
-            cout << "Status: " << stackRiwayat[i].aktivitas << endl;
+        NodeRiwayat* temp = topStack;
+        int counter = 1;
+        while (temp != nullptr) {
+            cout << "No. " << counter << " (TOP";
+            if (counter > 1) cout << "-" << (counter - 1);
+            cout << ") | ";
+            cout << "Buku: " << temp->data.judulBuku << " | ";
+            cout << "Status: " << temp->data.aktivitas << endl;
+            temp = temp->next;
+            counter++;
         }
         cout << "==========================================================" << endl;
     }
 
     void lihatbuku() {
-        if (jumlahBuku == 0) {
+        if (head == nullptr) {
             cout << "Tidak ada data buku tersedia" << endl;
             return;
         }
 
         cout << "============= Daftar Buku =============" << endl;
-        for (int i = 0; i < jumlahBuku; i++) {
-            cout << "ID: " << bukuDaftar[i].id << " | " << bukuDaftar[i].judul << " (" << bukuDaftar[i].status << ")" << endl;
+        NodeBuku* temp = head;
+        while (temp != nullptr) {
+            cout << "ID: " << temp->data.id << " | " << temp->data.judul << " (" << temp->data.status << ")" << endl;
+            temp = temp->next;
         }
         cout << "---------------------------------------" << endl;
     }
@@ -176,25 +264,27 @@ public:
         cout << "============= Kasir: Proses Peminjaman =============" << endl;
         cout << "Masukkan ID Buku yang akan dipinjam: ";
         if (!(cin >> idPinjam)) {
-            cout << "Input tidak valid.\n"; cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n'); return;
+            cout << "Input tidak valid.\n"; 
+            cin.clear(); 
+            cin.ignore(1000, '\n'); 
+            return;
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.ignore(1000, '\n');
 
-        for (int i = 0; i < jumlahBuku; i++) {
-            if (bukuDaftar[i].id == idPinjam) {
-                if (bukuDaftar[i].status == "Tersedia") {
-                    bukuDaftar[i].status = "Dipinjam";
+        NodeBuku* temp = head;
+        while (temp != nullptr) {
+            if (temp->data.id == idPinjam) {
+                if (temp->data.status == "Tersedia") {
+                    temp->data.status = "Dipinjam";
                     simpanKeFile(); 
-                    
-                    // --> PUSH KE STACK
-                    pushRiwayat(bukuDaftar[i].judul, "DIPINJAM"); 
-                    
+                    pushRiwayat(temp->data.judul, "DIPINJAM"); 
                     cout << "\n[SUKSES] Buku berhasil dipinjam." << endl;
                 } else {
                     cout << "\n[GAGAL] Buku sedang dipinjam." << endl;
                 }
                 return; 
             }
+            temp = temp->next;
         }
         cout << "\n[ERROR] Buku tidak ditemukan." << endl;
     }
@@ -204,25 +294,27 @@ public:
         cout << "============= Kasir: Proses Pengembalian =============" << endl;
         cout << "Masukkan ID Buku yang dikembalikan: ";
         if (!(cin >> idKembali)) {
-            cout << "Input tidak valid.\n"; cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n'); return;
+            cout << "Input tidak valid.\n"; 
+            cin.clear(); 
+            cin.ignore(1000, '\n'); 
+            return;
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.ignore(1000, '\n');
 
-        for (int i = 0; i < jumlahBuku; i++) {
-            if (bukuDaftar[i].id == idKembali) {
-                if (bukuDaftar[i].status == "Dipinjam") {
-                    bukuDaftar[i].status = "Tersedia";
+        NodeBuku* temp = head;
+        while (temp != nullptr) {
+            if (temp->data.id == idKembali) {
+                if (temp->data.status == "Dipinjam") {
+                    temp->data.status = "Tersedia";
                     simpanKeFile();
-                    
-                    // --> PUSH KE STACK
-                    pushRiwayat(bukuDaftar[i].judul, "DIKEMBALIKAN");
-
+                    pushRiwayat(temp->data.judul, "DIKEMBALIKAN");
                     cout << "\n[SUKSES] Buku berhasil dikembalikan." << endl;
                 } else {
                     cout << "\n[INFO] Buku sudah berstatus tersedia." << endl;
                 }
                 return; 
             }
+            temp = temp->next;
         }
         cout << "\n[ERROR] Buku tidak ditemukan." << endl;
     }
@@ -238,14 +330,17 @@ void MenuKasir::tampilkanMenu() {
         cout << "2. Pinjam Buku\n"; 
         cout << "3. Kembalikan Buku\n";
         cout << "4. Lihat Histori (STACK)\n"; 
-        cout << "5. Hapus Histori Terakhir (POP)\n"; // <-- MENU BARU
+        cout << "5. Hapus Histori Terakhir (POP)\n"; 
         cout << "0. Logout\n";
         cout << "Pilih menu: ";
 
         while (!(cin >> pilihan)) {
-            cout << "Input tidak valid. Masukkan angka: "; cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n'); cout << "Pilih menu: "; 
+            cout << "Input tidak valid. Masukkan angka: "; 
+            cin.clear(); 
+            cin.ignore(1000, '\n'); 
+            cout << "Pilih menu: "; 
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.ignore(1000, '\n');
 
         switch (pilihan) {
             case 1:
@@ -260,11 +355,11 @@ void MenuKasir::tampilkanMenu() {
             case 4: 
                 manajemenKasir.lihatHistori();
                 break;
-            case 5: // <-- PANGGIL FUNGSI POP
+            case 5:
                 manajemenKasir.popRiwayat();
                 break;
             case 0:
-                cout << "Logout berhasil!\n";
+                cout << "Logout berhasil! (Data tersimpan)\n";
                 break;
             default:
                 cout << "Pilihan tidak valid!\n";

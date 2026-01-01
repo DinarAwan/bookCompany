@@ -1,9 +1,16 @@
 #include "Login.h"
 #include <iostream>
+
 using namespace std;
 
 Login::Login() {
     role = 0;
+    nik = 0;
+    manajemenUser = new ManajemenUser();
+}
+
+Login::~Login() {
+    delete manajemenUser;
 }
 
 void Login::prosesLogin() {
@@ -15,36 +22,30 @@ void Login::prosesLogin() {
     cout << "==========================================\n";
 
     cout << " Silahkan login terlebih dahulu:\n";
-    cout << " Masukkan username: ";
-    cin >> username;
+    cout << " Masukkan NIK: ";
+    cin >> nik;
     cout << " Masukkan password: ";
     cin >> password;
 
-    if (username == "admin" && password == "1234") {
-        role = 1;
-        cout << "\nLogin berhasil! Anda masuk sebagai ADMIN.\n";
-    } 
-    else if (username == "super" && password == "1234") {
-        role = 2;
-        cout << "\nLogin berhasil! Anda masuk sebagai SUPER ADMIN.\n";
-    } else if (username == "pengguna" && password == "1234") {
-        role = 3;
-        cout << "\nLogin berhasil! Anda masuk sebagai PENGGUNA.\n";
-    } else if (username == "satpam" && password == "1234") {
-        role = 4;
-        cout << "\nLogin berhasil! Anda masuk sebagai SATPAM.\n";
-    } else if (username == "karyawan" && password == "1234") {
-        role = 5;
-        cout << "\nLogin berhasil! Anda masuk sebagai KARYAWAN.\n";
-    } else if (username == "kasir" && password == "1234") {
-        role = 6;
-        cout << "\nLogin berhasil! Anda masuk sebagai KASIR.\n";
-    } else if (username == "ob" && password == "1234") {
-        role = 7;
-        cout << "\nLogin berhasil! Anda masuk sebagai OB.\n";
+    int userRole;
+    if (manajemenUser->verifikasiLogin(nik, password, userRole)) {
+        role = userRole;
+        
+        cout << "\nLogin berhasil! Anda masuk sebagai ";
+        switch(role) {
+            case 1: cout << "ADMIN"; break;
+            case 2: cout << "SUPER ADMIN"; break;
+            case 3: cout << "PENGGUNA"; break;
+            case 4: cout << "SATPAM"; break;
+            case 5: cout << "KARYAWAN"; break;
+            case 6: cout << "KASIR"; break;
+            case 7: cout << "OB"; break;
+            default: cout << "UNKNOWN"; break;
+        }
+        cout << ".\n";
     }
     else {
-        cout << "\nUsername atau password salah!\n";
+        cout << "\nNIK atau password salah!\n";
         role = 0;
     }
     cout << endl;

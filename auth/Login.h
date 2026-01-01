@@ -2,18 +2,22 @@
 #define LOGIN_H
 
 #include <string>
+#include "ManajemenUser.h"
+
 using namespace std;
 
 class Login {
 private:
-    string username;
+    long long int nik;
     string password;
-    int role; 
+    int role;
+    ManajemenUser* manajemenUser;
 
 public:
-    Login();               
-    void prosesLogin();    
-    int getRole() const;  
+    Login();
+    ~Login();
+    void prosesLogin();
+    int getRole() const;
 };
 
 #endif
