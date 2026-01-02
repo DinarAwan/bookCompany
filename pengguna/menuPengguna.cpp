@@ -2,7 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
-#include <string> 
+#include <string>
+#include "../auth/ManajemenUser.h"
+#include "../KTP/ktp.h"
 
 using namespace std;
 
@@ -272,4 +274,101 @@ void MenuPengguna::tampilkanMenu() {
         }
         cout << endl;
     } while (pilihan != 0);
+}
+
+// Static method untuk registrasi pengguna baru
+void MenuPengguna::registrasi() {
+    ManajemenUser manajemenUser;
+    KTP userBaru;
+    
+    cout << "\n========== REGISTRASI PENGGUNA BARU ==========\n";
+    
+    // Input NIK
+    cout << "Masukkan NIK: ";
+    cin >> userBaru.nik;
+    
+    // Cek apakah NIK sudah ada
+    if (manajemenUser.isNIKExists(userBaru.nik)) {
+        cout << "Error: NIK sudah terdaftar! Silakan login.\n";
+        cin.ignore(1000, '\n');
+        return;
+    }
+    
+    cin.ignore(1000, '\n');
+    
+    // Input Nama
+    cout << "Masukkan Nama Lengkap: ";
+    getline(cin, userBaru.nama);
+    
+    // Input Tanggal Lahir
+    cout << "Masukkan Tanggal Lahir (hari bulan tahun): ";
+    cin >> userBaru.tanggalLahir.hari 
+        >> userBaru.tanggalLahir.bulan 
+        >> userBaru.tanggalLahir.tahun;
+    
+    // Input Jenis Kelamin
+    cout << "Masukkan Jenis Kelamin (1: LAKI-LAKI, 2: PEREMPUAN): ";
+    int jk;
+    cin >> jk;
+    userBaru.jenisKelamin = (jk == 1) ? LAKI_LAKI : PEREMPUAN;
+    cin.ignore(1000, '\n');
+    
+    // Input Alamat
+    cout << "Masukkan Alamat: ";
+    getline(cin, userBaru.alamat);
+    
+    // Input Agama
+    cout << "Masukkan Agama (1:ISLAM, 2:KRISTEN, 3:KATOLIK, 4:HINDU, 5:BUDDHA, 6:KHONGHUCU): ";
+    int ag;
+    cin >> ag;
+    userBaru.agama = (Agama)ag;
+    
+    // Input Status Perkawinan
+    cout << "Masukkan Status Perkawinan (1: BELUM KAWIN, 2: KAWIN): ";
+    int st;
+    cin >> st;
+    userBaru.statusPerkawinan = (st == 1) ? BELUM_KAWIN : KAWIN;
+    cin.ignore(1000, '\n');
+    
+    // Input Pekerjaan
+    cout << "Masukkan Pekerjaan: ";
+    getline(cin, userBaru.pekerjaan);
+    
+    // Input Kewarganegaraan
+    cout << "Kewarganegaraan (1: WNI, 2: WNA): ";
+    int kw;
+    cin >> kw;
+    userBaru.kewarganegaraan = (kw == 1) ? WNI : WNA;
+    cin.ignore(1000, '\n');
+    
+    // Role otomatis = 3 (Pengguna)
+    userBaru.role = 3;
+    
+    // Input Password
+    cout << "Masukkan Password: ";
+    getline(cin, userBaru.password);
+    
+    // Konfirmasi Password
+    string konfirmasiPassword;
+    cout << "Konfirmasi Password: ";
+    getline(cin, konfirmasiPassword);
+    
+    if (userBaru.password != konfirmasiPassword) {
+        cout << "\nError: Password tidak cocok!\n";
+        return;
+    }
+    
+    // Tambahkan user
+    if (manajemenUser.tambahUser(userBaru)) {
+        cout << "\n========================================\n";
+        cout << "Registrasi Berhasil!\n";
+        cout << "========================================\n";
+        cout << "NIK: " << userBaru.nik << "\n";
+        cout << "Nama: " << userBaru.nama << "\n";
+        cout << "Role: PENGGUNA\n";
+        cout << "\nAnda dapat login sekarang dengan NIK dan password Anda.\n";
+        cout << "========================================\n";
+    } else {
+        cout << "\nGagal melakukan registrasi!\n";
+    }
 }

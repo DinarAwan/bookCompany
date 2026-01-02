@@ -78,17 +78,14 @@ void MenuAdmin::tampilkanMenu() {
     muatAntrian();
 
     int pilihan;
-    string array[6]; 
-    array[0] = "1. Tambah Data Buku";
-    array[1] = "2. Lihat Data Buku";
-    array[2] = "3. Hapus Data Buku";
-    array[3] = "4. Kelola Tugas Satpam (CRUD)";
-    array[4] = "5. Kelola Tugas OB (Queue Linked List)"; 
-    array[5] = "0. Logout";
+    string array[3]; 
+    array[0] = "1. Kelola Tugas Satpam (CRUD)";
+    array[1] = "2. Kelola Tugas OB (Queue Linked List)"; 
+    array[2] = "0. Logout";
 
     do {
         cout << "========== MENU ADMIN ==========\n";
-        for (int i = 0; i < 6; i++) cout << array[i] << endl;
+        for (int i = 0; i < 3; i++) cout << array[i] << endl;
         cout << "Pilih menu: ";
         
         while (!(cin >> pilihan)) {
@@ -99,11 +96,8 @@ void MenuAdmin::tampilkanMenu() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (pilihan) {
-            case 1: cout << "Menambah data buku...\n"; break;
-            case 2: cout << "Menampilkan data buku...\n"; break;
-            case 3: cout << "Menghapus data buku...\n"; break;
-            case 4: kelolaTugasSatpam(); break;
-            case 5: kelolaTugasOb(); break;
+            case 1: kelolaTugasSatpam(); break;
+            case 2: kelolaTugasOb(); break;
             case 0: cout << "Logout berhasil!\n"; break;
             default: cout << "Pilihan tidak valid!\n";
         }

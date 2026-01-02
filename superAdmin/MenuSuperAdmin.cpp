@@ -21,15 +21,15 @@ Node* BinarySearchTree::tambahdata(Node* root, karyawan kar) {
         return buatNode(kar);
     }
 
-     if (kar.id < root->data.id) {
-            root->left = tambahdata(root->left, kar);
-        } 
-        else if (kar.id > root->data.id) {
-            root->right = tambahdata(root->right, kar);
-        } 
-        else {
-            cout << "ID karyawan sudah ada!\n";
-        }
+    if (kar.id < root->data.id) {
+        root->left = tambahdata(root->left, kar);
+    } 
+    else if (kar.id > root->data.id) {
+        root->right = tambahdata(root->right, kar);
+    } 
+    else {
+        cout << "ID karyawan sudah ada!\n";
+    }
     return root;
 }
 
@@ -43,23 +43,22 @@ Node* BinarySearchTree::search(Node* root, int id) {
     }
     if (id < root->data.id) {
         return search(root->left, id);
-    }else {
-    return search(root->right, id);
+    } else {
+        return search(root->right, id);
     }
 }
 
-//binary search tree inorder
+// binary search tree inorder
 void BinarySearchTree::inorder(Node* root) {
     if (!root) return;
-        inorder(root->left);
-        cout<<endl;
-        cout<<" ===================================\n";
-        cout << " ID: " << root->data.id << endl <<
-        " Nama: " << root->data.nama << endl <<
-        " Role: " << root->data.role << endl;
-        inorder(root->right);
-        cout<<"====================================\n";
-    
+    inorder(root->left);
+    cout << endl;
+    cout << " ===================================\n";
+    cout << " ID: " << root->data.id << endl <<
+            " Nama: " << root->data.nama << endl <<
+            " Role: " << root->data.role << endl;
+    inorder(root->right);
+    cout << "====================================\n";
 }
 
 void SuperAdmin::tambahKaryawan() {
@@ -88,16 +87,16 @@ void SuperAdmin::cariKaryawan() {
     Node* hasil = tree.search(tree.root, idCari);
     if (hasil != nullptr) {
         cout << "Karyawan ditemukan dengan id: " << hasil->data.id << endl <<
-        " Nama: " << hasil->data.nama << endl <<
-        " Role: " << hasil->data.role << endl;
+                " Nama: " << hasil->data.nama << endl <<
+                " Role: " << hasil->data.role << endl;
     } else {
         cout << "Karyawan dengan ID " << idCari << " tidak ditemukan.\n";
     }
 }
 
-//simpan ke file
-void  BinarySearchTree::simpankefile(Node *root, ofstream &file) {
-  if (!root) return;
+// simpan ke file
+void BinarySearchTree::simpankefile(Node *root, ofstream &file) {
+    if (!root) return;
     simpankefile(root->left, file);
 
     file << root->data.id << "|"
@@ -105,7 +104,6 @@ void  BinarySearchTree::simpankefile(Node *root, ofstream &file) {
          << root->data.role << endl;
 
     simpankefile(root->right, file);
-
 }
 
 void SuperAdmin::simpanKaryawanKeFile(const string &filekaryawan) {
@@ -139,35 +137,123 @@ void SuperAdmin::loadKaryawanDariFile(const string &filekaryawan) {
         kar.id = stoi(idtostr);
         tree.tambahDataKaryawan(kar);
     }
-     file.close();
-     cout << "Data karyawan berhasil dimuat dari " << filekaryawan << endl;
+    file.close();
+    cout << "Data karyawan berhasil dimuat dari " << filekaryawan << endl;
 }
 
+// Fungsi: Tambah User Karyawan dengan data KTP lengkap
+void SuperAdmin::tambahUserKaryawan() {
+    KTP userBaru;
+    
+    cout << "\n========== TAMBAH USER/KARYAWAN ==========\n";
+    cout << "Masukkan NIK: ";
+    cin >> userBaru.nik;
+    
+    if (manajemenUser->isNIKExists(userBaru.nik)) {
+        cout << "Error: NIK sudah terdaftar!\n";
+        cin.ignore(1000, '\n');
+        return;
+    }
+    
+    cin.ignore(1000, '\n');
+    cout << "Masukkan Nama: ";
+    getline(cin, userBaru.nama);
+    
+    cout << "Masukkan Tanggal Lahir (hari bulan tahun): ";
+    cin >> userBaru.tanggalLahir.hari 
+        >> userBaru.tanggalLahir.bulan 
+        >> userBaru.tanggalLahir.tahun;
+    
+    cout << "Masukkan Jenis Kelamin (1: LAKI-LAKI, 2: PEREMPUAN): ";
+    int jk;
+    cin >> jk;
+    userBaru.jenisKelamin = (jk == 1) ? LAKI_LAKI : PEREMPUAN;
+    cin.ignore(1000, '\n');
+    
+    cout << "Masukkan Alamat: ";
+    getline(cin, userBaru.alamat);
+    
+    cout << "Masukkan Agama (1:ISLAM, 2:KRISTEN, 3:KATOLIK, 4:HINDU, 5:BUDDHA, 6:KHONGHUCU): ";
+    int ag;
+    cin >> ag;
+    userBaru.agama = (Agama)ag;
+    
+    cout << "Masukkan Status Perkawinan (1: BELUM KAWIN, 2: KAWIN): ";
+    int st;
+    cin >> st;
+    userBaru.statusPerkawinan = (st == 1) ? BELUM_KAWIN : KAWIN;
+    cin.ignore(1000, '\n');
+    
+    cout << "Masukkan Pekerjaan: ";
+    getline(cin, userBaru.pekerjaan);
+    
+    cout << "Kewarganegaraan (1: WNI, 2: WNA): ";
+    int kw;
+    cin >> kw;
+    userBaru.kewarganegaraan = (kw == 1) ? WNI : WNA;
+    cin.ignore(1000, '\n');
+    
+    cout << "\nPilih Role:\n";
+    cout << "1. Admin\n2. Super Admin\n4. Satpam\n5. Karyawan\n6. Kasir\n7. OB\n";
+    cout << "Masukkan Role: ";
+    cin >> userBaru.role;
+    cin.ignore(1000, '\n');
+    
+    cout << "Masukkan Password: ";
+    getline(cin, userBaru.password);
+    
+    if (manajemenUser->tambahUser(userBaru)) {
+        cout << "\nUser/Karyawan berhasil ditambahkan!\n";
+    } else {
+        cout << "\nGagal menambahkan user!\n";
+    }
+}
 
 void MenuSuperAdmin::tampilkanMenu() {
-    
     int pilihan;
     do {
         cout << "====== MENU SUPER ADMIN ======\n";
-        cout << "1. Tambah Karyawan\n";
-        cout << "2. Tampilkan Karyawan\n";
-        cout << "3. Cari Karyawan\n";
+        cout << "1. Tambah User/Karyawan (KTP Lengkap)\n";
+        cout << "2. Lihat Semua User\n";
+        cout << "3. Build BST (Sort User by NIK)\n";
+        cout << "4. Lihat User Terurut (BST)\n";
+        cout << "5. Cari User by NIK (BST)\n";
         cout << "0. Logout\n";
         cout << "Pilih menu: ";
         cin >> pilihan;
 
         switch (pilihan) {
             case 1:
-                Sadmin.tambahKaryawan();
+                Sadmin.tambahUserKaryawan();
                 break;
             case 2:
-                Sadmin.tampilkanKaryawan();
+                Sadmin.manajemenUser->displayAllUsers();
                 break;
             case 3:
-               Sadmin.cariKaryawan();
+                Sadmin.manajemenUser->buildBSTFromList();
                 break;
+            case 4:
+                Sadmin.manajemenUser->displayUsersSorted();
+                break;
+            case 5: {
+                long long int nikCari;
+                cout << "Masukkan NIK yang dicari: ";
+                cin >> nikCari;
+                
+                KTP* result = Sadmin.manajemenUser->searchUserBST(nikCari);
+                if (result != nullptr) {
+                    cout << "\n========== USER DITEMUKAN ==========\n";
+                    cout << "NIK           : " << result->nik << "\n";
+                    cout << "Nama          : " << result->nama << "\n";
+                    cout << "Role          : " << result->role << "\n";
+                    cout << "====================================\n";
+                } else {
+                    cout << "User dengan NIK " << nikCari << " tidak ditemukan.\n";
+                }
+                break;
+            }
             case 0:
-                 Sadmin.simpanKaryawanKeFile("karyawan.txt"); //langsung save ke file saat logout
+                Sadmin.simpanKaryawanKeFile("karyawan.txt");
                 cout << "Logout berhasil!\n";
                 break;
             default:
