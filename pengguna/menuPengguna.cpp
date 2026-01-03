@@ -6,17 +6,9 @@
 #include "../auth/ManajemenUser.h"
 #include "../KTP/ktp.h"
 
-using namespace std;
+#include "../Buku.h"
 
-struct Buku {
-    int id;
-    string judul;
-    string penulis;
-    int tahun;
-    string isbn;
-    string kategori;
-    string status; 
-};
+using namespace std;
 
 class ManajemenBuku {
 private:
@@ -63,6 +55,16 @@ private:
                 buku.status = "Tersedia";
             }
 
+            // Baca harga, stok, totalTerjual
+            if (!(file >> buku.harga)) buku.harga = 0;
+            file.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            if (!(file >> buku.stok)) buku.stok = 0;
+            file.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            if (!(file >> buku.totalTerjual)) buku.totalTerjual = 0;
+            file.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (jumlahBuku >= kapasitas) {
                 perbesarKapasitas();
             }
@@ -83,7 +85,10 @@ private:
             file << bukuDaftar[i].tahun << "\n";
             file << bukuDaftar[i].isbn << "\n";
             file << bukuDaftar[i].kategori << "\n";
-            file << bukuDaftar[i].status << "\n"; 
+            file << bukuDaftar[i].status << "\n";
+            file << bukuDaftar[i].harga << "\n";
+            file << bukuDaftar[i].stok << "\n";
+            file << bukuDaftar[i].totalTerjual << "\n";
         }
         file.close();
     }
@@ -105,6 +110,7 @@ public:
     }
 
     
+    
     void lihatbuku() {
         if (jumlahBuku == 0) {
             cout << "Tidak ada data buku tersedia" << endl;
@@ -112,14 +118,22 @@ public:
             
         }
 
-        cout << "============= Daftar Buku =============" << endl;
+        cout << "\n===============================================" << endl;
+        cout << "                  DAFTAR BUKU                  " << endl;
+        cout << "===============================================" << endl;
+        
         for (int i = 0; i < jumlahBuku; i++) {
-            cout << "ID Buku: " << bukuDaftar[i].id << endl;
-            cout << "Judul: " << bukuDaftar[i].judul << endl;
-            cout << "Penulis: " << bukuDaftar[i].penulis << endl;
-            cout << "Tahun Terbit: " << bukuDaftar[i].tahun << endl;
-            cout << "Status: " << bukuDaftar[i].status << endl; 
-            cout << "-----------------------------------" << endl;
+            cout << "Buku #" << (i+1) << endl;
+            cout << "   ID            : " << bukuDaftar[i].id << endl;
+            cout << "   Judul         : " << bukuDaftar[i].judul << endl;
+            cout << "   Penulis       : " << bukuDaftar[i].penulis << endl;
+            cout << "   Tahun Terbit  : " << bukuDaftar[i].tahun << endl;
+            cout << "   ISBN          : " << bukuDaftar[i].isbn << endl;
+            cout << "   Kategori      : " << bukuDaftar[i].kategori << endl;
+            cout << "   Harga         : Rp " << bukuDaftar[i].harga << endl;
+            cout << "   Stok          : " << bukuDaftar[i].stok << " unit" << endl;
+            cout << "   Status        : " << bukuDaftar[i].status << endl;
+            cout << "-----------------------------------------------" << endl;
         }
     }
 
@@ -143,12 +157,17 @@ public:
             if (bukuDaftar[i].judul.find(kataKunci) != string::npos || 
                 bukuDaftar[i].penulis.find(kataKunci) != string::npos) 
             {
-                cout << "ID Buku: " << bukuDaftar[i].id << endl;
-                cout << "Judul: " << bukuDaftar[i].judul << endl;
-                cout << "Penulis: " << bukuDaftar[i].penulis << endl;
-                cout << "Tahun Terbit: " << bukuDaftar[i].tahun << endl;
-                cout << "Status: " << bukuDaftar[i].status << endl; 
-                cout << "-----------------------------------" << endl;
+                cout << "Buku #" << (i+1) << endl;
+                cout << "   ID            : " << bukuDaftar[i].id << endl;
+                cout << "   Judul         : " << bukuDaftar[i].judul << endl;
+                cout << "   Penulis       : " << bukuDaftar[i].penulis << endl;
+                cout << "   Tahun Terbit  : " << bukuDaftar[i].tahun << endl;
+                cout << "   ISBN          : " << bukuDaftar[i].isbn << endl;
+                cout << "   Kategori      : " << bukuDaftar[i].kategori << endl;
+                cout << "   Harga         : Rp " << bukuDaftar[i].harga << endl;
+                cout << "   Stok          : " << bukuDaftar[i].stok << " unit" << endl;
+                cout << "   Status        : " << bukuDaftar[i].status << endl;
+                cout << "-----------------------------------------------" << endl;
                 ditemukan = true;
             }
         }

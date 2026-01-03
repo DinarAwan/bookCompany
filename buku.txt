@@ -1,28 +1,460 @@
-1
-Dari Penjara Ke  Penjara
-TANMALAKA
-2001
-kshcnak4
+100
+Madilog - Materialisme Dialektika Logika
+Tan Malaka
+1943
+978-6021186001
+Filsafat
+Tersedia
+125000
+15
+8
+101
+Dari Penjara ke Penjara Jilid 1
+Tan Malaka
+1948
+978-6021186018
 Biografi
 Tersedia
+95000
+12
+5
+102
+Dari Penjara ke Penjara Jilid 2
+Tan Malaka
+1948
+978-6021186025
+Biografi
+Tersedia
+95000
+10
+3
+103
+Dari Penjara ke Penjara Jilid 3
+Tan Malaka
+1948
+978-6021186032
+Biografi
+Tersedia
+95000
+8
 2
-MADILOG
-Tanmalaka
-1942
-456789sd
-Biografi
-Dipinjam
-22
-Sangkuriang
-Padidi
+104
+Thesis - Perjuangan Kemerdekaan Indonesia
+Tan Malaka
+1925
+978-6021186049
+Politik
+Tersedia
+85000
+7
+4
+105
+Aksi Massa
+Tan Malaka
+1926
+978-6021186056
+Politik
+Tersedia
+75000
+9
+6
+106
+Gerpolek - Gerilya-Politik-Ekonomi
+Tan Malaka
+1946
+978-6021186063
+Politik
+Tersedia
+110000
+11
+7
+107
+Pandangan Hidup
+Tan Malaka
+1952
+978-6021186070
+Filsafat
+Tersedia
+90000
+6
+1
+108
+Bumi Manusia
+Pramoedya Ananta Toer
+1980
+978-6024246945
+Fiksi Sejarah
+Tersedia
+98000
+20
+15
+109
+Anak Semua Bangsa
+Pramoedya Ananta Toer
+1980
+978-6024246952
+Fiksi Sejarah
+Tersedia
+98000
+18
+12
+110
+Jejak Langkah
+Pramoedya Ananta Toer
+1985
+978-6024246969
+Fiksi Sejarah
+Tersedia
+98000
+16
+10
+111
+Rumah Kaca
+Pramoedya Ananta Toer
+1988
+978-6024246976
+Fiksi Sejarah
+Tersedia
+98000
+14
+8
+112
+Gadis Pantai
+Pramoedya Ananta Toer
+1965
+978-6024246983
+Fiksi
+Tersedia
+85000
+13
+9
+113
+Nyanyi Sunyi Seorang Bisu 1
+Pramoedya Ananta Toer
+1995
+978-6024246990
+Puisi
+Tersedia
+75000
+8
+3
+114
+Nyanyi Sunyi Seorang Bisu 2
+Pramoedya Ananta Toer
+1997
+978-6024247003
+Puisi
+Tersedia
+75000
+7
+2
+115
+Arus Balik
+Pramoedya Ananta Toer
+1995
+978-6024247010
+Fiksi Sejarah
+Tersedia
+120000
+12
+11
+116
+Arok Dedes
+Pramoedya Ananta Toer
 1999
-6789sdjh
-Novel
+978-6024247027
+Fiksi Sejarah
 Tersedia
-23
-Si hitam Dari Gua
-Jhon Lenon
-1998
-567689fgh
-Novel
+95000
+10
+6
+117
+Mangir
+Pramoedya Ananta Toer
+2000
+978-6024247034
+Fiksi Sejarah
 Tersedia
+88000
+9
+4
+118
+Larasati
+Pramoedya Ananta Toer
+2000
+978-6024247041
+Fiksi Sejarah
+Tersedia
+88000
+11
+5
+119
+Keluarga Gerilya
+Pramoedya Ananta Toer
+1950
+978-6024247058
+Fiksi
+Tersedia
+72000
+6
+7
+120
+Perburuan
+Pramoedya Ananta Toer
+1950
+978-6024247065
+Fiksi
+Tersedia
+68000
+8
+9
+121
+Mereka Yang Dilumpuhkan
+Pramoedya Ananta Toer
+1951
+978-6024247072
+Fiksi
+Tersedia
+70000
+7
+3
+122
+Cerita dari Blora
+Pramoedya Ananta Toer
+1952
+978-6024247089
+Cerpen
+Tersedia
+65000
+10
+8
+123
+Di Tepi Kali Bekasi
+Pramoedya Ananta Toer
+1951
+978-6024247096
+Cerpen
+Tersedia
+62000
+9
+4
+124
+Korupsi
+Pramoedya Ananta Toer
+1954
+978-6024247102
+Fiksi
+Tersedia
+75000
+11
+6
+125
+Midah Si Manis Bergigi Emas
+Pramoedya Ananta Toer
+1954
+978-6024247119
+Cerpen
+Tersedia
+58000
+8
+2
+126
+Kronik Revolusi Indonesia Jilid 1
+Tan Malaka
+1946
+978-6021186087
+Sejarah
+Tersedia
+135000
+5
+1
+127
+Kronik Revolusi Indonesia Jilid 2
+Tan Malaka
+1946
+978-6021186094
+Sejarah
+Tersedia
+135000
+4
+0
+128
+Semangat Muda
+Tan Malaka
+1926
+978-6021186100
+Politik
+Tersedia
+68000
+12
+5
+129
+Massa Aksi
+Tan Malaka
+1947
+978-6021186117
+Politik
+Tersedia
+92000
+9
+7
+130
+Muslihat
+Tan Malaka
+1945
+978-6021186124
+Politik
+Tersedia
+78000
+6
+3
+131
+Gabungan Aslia
+Tan Malaka
+1946
+978-6021186131
+Politik
+Tersedia
+82000
+8
+4
+132
+Hoakiau di Indonesia
+Pramoedya Ananta Toer
+1960
+978-6024247126
+Non-Fiksi
+Tersedia
+88000
+7
+5
+133
+Panggil Aku Kartini Saja
+Pramoedya Ananta Toer
+2003
+978-6024247133
+Biografi
+Tersedia
+92000
+13
+10
+134
+Sang Pemula
+Pramoedya Ananta Toer
+1985
+978-6024247140
+Fiksi Sejarah
+Tersedia
+78000
+10
+6
+135
+Jalan Raya Pos Jalan Daendels
+Pramoedya Ananta Toer
+2005
+978-6024247157
+Sejarah
+Tersedia
+105000
+8
+8
+136
+Sekali Peristiwa di Banten Selatan
+Pramoedya Ananta Toer
+1979
+978-6024247164
+Cerpen
+Tersedia
+55000
+6
+2
+137
+Cerita Calon Arang
+Pramoedya Ananta Toer
+1957
+978-6024247171
+Fiksi
+Tersedia
+65000
+9
+4
+138
+Footsteps - Jejak Langkah Edisi Bahasa Inggris
+Pramoedya Ananta Toer
+1990
+978-0140256314
+Fiksi Sejarah
+Tersedia
+145000
+5
+3
+139
+This Earth of Mankind - Bumi Manusia Edisi Bahasa Inggris
+Pramoedya Ananta Toer
+1982
+978-0140256307
+Fiksi Sejarah
+Tersedia
+145000
+4
+2
+140
+Tales from Djakarta
+Pramoedya Ananta Toer
+1999
+978-9793780016
+Cerpen
+Tersedia
+85000
+7
+5
+141
+House of Glass - Rumah Kaca Edisi Bahasa Inggris
+Pramoedya Ananta Toer
+1992
+978-0140256338
+Fiksi Sejarah
+Tersedia
+145000
+3
+1
+142
+Hikayat Kadiroen
+Pramoedya Ananta Toer
+1992
+978-6024247188
+Fiksi
+Tersedia
+72000
+8
+6
+143
+Guerrilla Tactics - Taktik Gerilya
+Tan Malaka
+1948
+978-6021186148
+Militer
+Tersedia
+98000
+6
+2
+144
+Indonesische Onafhankelijkheid
+Tan Malaka
+1945
+978-6021186155
+Politik
+Tersedia
+115000
+4
+1
+145
+The Struggle for Indonesian Independence
+Tan Malaka
+1949
+978-6021186162
+Politik
+Dipinjam
+125000
+2
+1

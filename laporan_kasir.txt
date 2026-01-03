@@ -1,0 +1,2 @@
+3-1-2026|DUMMY_NIK|DUMMY_NAMA|500000|4|3|500000|Aku ada makan malam jadi harus pulang cepat
+3-1-2026|3201016666666666|Dedi Kasir|10|5|5|800000|Hari ini kita kedatang jokowi

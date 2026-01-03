@@ -4,6 +4,7 @@
 #include <string>
 #include "../auth/ManajemenUser.h"
 #include "../KTP/ktp.h"
+#include "../huffman/HuffmanTree.h"  // NEW: Huffman compression
 using namespace std;
 
 struct karyawan {
@@ -41,9 +42,11 @@ public:
     BinarySearchTree tree;  
     SuperAdmin() {
         manajemenUser = new ManajemenUser();
+        huffmanTree = new HuffmanTree();  // NEW: Initialize Huffman
     }
     ~SuperAdmin() {
         delete manajemenUser;
+        delete huffmanTree;  // NEW: Cleanup
     }
     
     void simpanKaryawanKeFile(const string &filename);
@@ -54,6 +57,20 @@ public:
     
     // Fitur baru: Tambah user dengan KTP lengkap
     void tambahUserKaryawan();
+    
+    // NEW: Huffman & Laporan features
+    void menuManajemenLaporan();
+    void bacaLaporanKasir();
+    void bacaLaporanKaryawan();
+    void bacaSemuaLaporan();
+    void kompresiLaporan();
+    void dekompresiLaporan();
+    void analisisFrequensi();
+    void visualisasiHuffmanTree();
+    void statistikKompresi();
+    
+private:
+    HuffmanTree* huffmanTree;  // NEW: Huffman tree instance
 };
 
 class MenuSuperAdmin {
