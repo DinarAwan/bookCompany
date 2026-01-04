@@ -5,6 +5,7 @@
 #include <fstream>
 #include "../auth/ManajemenUser.h"
 #include "../KTP/ktp.h"
+#include "../huffman/HuffmanTree.h"  // Huffman compression included
 
 using namespace std;
 
@@ -46,10 +47,12 @@ public:
 
     SuperAdmin() {
         manajemenUser = new ManajemenUser();
+        huffmanTree = new HuffmanTree();  // Initialize Huffman
     }
     
     ~SuperAdmin() {
         delete manajemenUser;
+        delete huffmanTree;  // Cleanup
     }
     
     void simpanKaryawanKeFile(const string &filename);
@@ -60,6 +63,20 @@ public:
     
     // Fitur: Tambah user dengan data KTP lengkap
     void tambahUserKaryawan();
+    
+    // Huffman & Laporan features
+    void menuManajemenLaporan();
+    void bacaLaporanKasir();
+    void bacaLaporanKaryawan();
+    void bacaSemuaLaporan();
+    void kompresiLaporan();
+    void dekompresiLaporan();
+    void analisisFrequensi();
+    void visualisasiHuffmanTree();
+    void statistikKompresi();
+    
+private:
+    HuffmanTree* huffmanTree;  // Huffman tree instance
 };
 
 // Kelas untuk antarmuka Menu

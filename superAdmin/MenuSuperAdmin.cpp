@@ -218,6 +218,7 @@ void MenuSuperAdmin::tampilkanMenu() {
         cout << "3. Build BST (Sort User by NIK)\n";
         cout << "4. Lihat User Terurut (BST)\n";
         cout << "5. Cari User by NIK (BST)\n";
+        cout << "6. Manajemen Laporan & Kompresi Huffman\n";  // NEW
         cout << "0. Logout\n";
         cout << "Pilih menu: ";
         cin >> pilihan;
@@ -252,6 +253,9 @@ void MenuSuperAdmin::tampilkanMenu() {
                 }
                 break;
             }
+            case 6:  // NEW: Huffman & Laporan
+                Sadmin.menuManajemenLaporan();
+                break;
             case 0:
                 Sadmin.simpanKaryawanKeFile("karyawan.txt");
                 cout << "Logout berhasil!\n";

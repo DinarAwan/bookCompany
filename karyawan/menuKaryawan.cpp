@@ -3,21 +3,15 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+#include <sstream>
+
+#include "../Buku.h"
 
 using namespace std;
 
-struct Buku {
-    int id;
-    string judul;
-    string penulis;
-    int tahun;
-    string isbn;
-    string kategori;
-    string status;
-};
-
+// ===================== CLASS ABSEN KARYAWAN =====================
 class AbsenKaryawan {
-   public:
+public:
     struct AbsenK {
         int id;
         string nama;
@@ -28,6 +22,7 @@ class AbsenKaryawan {
     };
 
     AbsenK* head;
+    const string NAMA_FILE_ABSEN = "absenKaryawan.txt"; 
 
     AbsenKaryawan() {
         head = nullptr;
@@ -56,10 +51,15 @@ class AbsenKaryawan {
 
         cout << "Masukkan ID Karyawan: ";
         cin >> id;
-        cin.ignore();
+        cin.ignore(); // Bersihkan buffer
 
         cout << "Masukkan nama Karyawan: ";
         getline(cin, nama);
+
+        if (cekSudahAbsenMasuk(id)) {
+            cout << "Anda sudah melakukan absen masuk hari ini!\n";
+            return;
+        }
 
         string tanggal = ambilTanggalSekarang();
         string waktuMasuk = ambilWaktuSekarang();
@@ -69,7 +69,7 @@ class AbsenKaryawan {
 
         if (head == nullptr) {
             head = baru;
-            head->next = head; // circular
+            head->next = head; 
         } else {
             AbsenK* temp = head;
             while (temp->next != head)
@@ -82,6 +82,19 @@ class AbsenKaryawan {
         simpankeFile();
     }
 
+    bool cekSudahAbsenMasuk(int idCek) {
+        if (head == nullptr) return false;
+        AbsenK* temp = head;
+        string tglSkrg = ambilTanggalSekarang();
+        do {
+            if (temp->id == idCek && temp->tanggal == tglSkrg) {
+                return true;
+            }
+            temp = temp->next;
+        } while (temp != head);
+        return false;
+    }
+
     void tampilAbsenSendiri(int idCari) {
         if (head == nullptr) {
             cout << "Belum ada data absensi.\n";
@@ -91,14 +104,14 @@ class AbsenKaryawan {
         AbsenK* temp = head;
         bool ditemukan = false;
 
+        cout << "\n===== Riwayat Absensi ID: " << idCari << " =====\n";
         do {
             if (temp->id == idCari) {
-                cout << "\n===== Data Absensi Anda =====\n";
-                cout << "ID           : " << temp->id << endl;
-                cout << "Nama         : " << temp->nama << endl;
                 cout << "Tanggal      : " << temp->tanggal << endl;
+                cout << "Nama         : " << temp->nama << endl;
                 cout << "Waktu Masuk  : " << temp->waktuMasuk << endl;
                 cout << "Waktu Keluar : " << temp->waktuKeluar << endl;
+                cout << "--------------------------------\n";
                 ditemukan = true;
             }
             temp = temp->next;
@@ -108,7 +121,7 @@ class AbsenKaryawan {
             cout << "Belum ada data absensi untuk ID tersebut.\n";
     }
 
-     void absenKeluar(){
+    void absenKeluar() {
         int idCari;
         if (head == nullptr) {
             cout << "Belum ada data absensi.\n";
@@ -119,95 +132,91 @@ class AbsenKaryawan {
         cin >> idCari;
         AbsenK* temp = head;
         bool ditemukan = false;
+        string tglSekarang = ambilTanggalSekarang();
 
-        do{
-            if(temp->id == idCari && temp->tanggal == ambilTanggalSekarang()){
-              ditemukan = true;
+        do {
+            if (temp->id == idCari && temp->tanggal == tglSekarang) {
+                ditemukan = true;
 
-              if(temp->waktuKeluar != "-"){
-                cout<<"anda sudah absen keluar hari ini pada pukul "<<temp->waktuKeluar<<endl;
-                return;
-              }
+                if (temp->waktuKeluar != "-") {
+                    cout << "Anda sudah absen keluar hari ini pada pukul " << temp->waktuKeluar << endl;
+                    return;
+                }
+                
                 temp->waktuKeluar = ambilWaktuSekarang();
-                cout<<"anda berhasil absen keluar pada pukul "<<temp->waktuKeluar<<endl;
+                cout << "Anda berhasil absen keluar pada pukul " << temp->waktuKeluar << endl;
+                simpankeFile(); 
                 return;
             }
             temp = temp->next;
-        }while(temp != head);
+        } while (temp != head);
 
-        if(!ditemukan){
-            cout<<"anda belum absen masuk hari ini"<<endl;
+        if (!ditemukan) {
+            cout << "Anda belum absen masuk hari ini atau ID salah." << endl;
         }
-        simpankeFile();
-
     }
 
-    // ===================== SIMPAN & LOAD FILE =====================
-    void simpankeFile(){
-        ofstream file("absenKaryawan.txt");
+    // SIMPAN FORMAT PIPE (|) UNTUK ABSEN (Sesuai original)
+    void simpankeFile() {
+        ofstream file(NAMA_FILE_ABSEN); 
+        if (!file.is_open()) return;
 
-        if(!file.is_open()){
-            cout<<"gagal menyimpan data absen"<<endl;
-            return;
-        }
-
-        if(head == nullptr){
-            file.close();
-            return;
+        if (head == nullptr) {
+            file.close(); return;
         }
 
         AbsenK* temp = head;
-        do{
-            file<<temp->id<<"|"
-            <<temp->nama<<"|"
-            <<temp->tanggal<<"|"
-            <<temp->waktuMasuk<<"|"
-            <<temp->waktuKeluar<<"|\n";
+        do {
+            file << temp->id << "|"
+                 << temp->nama << "|"
+                 << temp->tanggal << "|"
+                 << temp->waktuMasuk << "|"
+                 << temp->waktuKeluar << endl;
             temp = temp->next;
-        }while(temp != head);
+        } while (temp != head);
         file.close();
     }
 
-    void loadDariFile(){
- ifstream file("absenOb.txt");
- if(!file.is_open()){
-    return;
- }
+    // LOAD FORMAT PIPE (|) UNTUK ABSEN
+    void loadDariFile() {
+        ifstream file(NAMA_FILE_ABSEN);
+        if (!file.is_open()) return;
 
-    string line;
- while (getline(file, line)) {
+        string line;
+        while (getline(file, line)) {
             if (line.empty()) continue;
 
-            size_t p1 = line.find('|');
-            size_t p2 = line.find('|', p1+1);
-            size_t p3 = line.find('|', p2+1);
-            size_t p4 = line.find('|', p3+1);
+            stringstream ss(line);
+            string s_id, s_nama, s_tanggal, s_masuk, s_keluar;
 
-            int id = stoi(line.substr(0, p1));
-            string nama = line.substr(p1+1, p2-p1-1);
-            string tanggal = line.substr(p2+1, p3-p2-1);
-            string masuk = line.substr(p3+1, p4-p3-1);
-            string keluar = line.substr(p4+1);
+            if (getline(ss, s_id, '|') &&
+                getline(ss, s_nama, '|') &&
+                getline(ss, s_tanggal, '|') &&
+                getline(ss, s_masuk, '|') &&
+                getline(ss, s_keluar)) {
+                
+                try {
+                    int id = stoi(s_id);
+                    AbsenK* baru = new AbsenK{id, s_nama, s_tanggal, s_masuk, s_keluar, nullptr};
 
-            AbsenK* baru = new AbsenK{id, nama, tanggal, masuk, keluar, nullptr};
-
-            if(head == nullptr){
-                head = baru;
-                head->next = head;
-            } else {
-                AbsenK* temp = head;
-                while(temp->next != head)
-                    temp = temp->next;
-                temp->next = baru;
-                baru->next = head;
+                    if (head == nullptr) {
+                        head = baru;
+                        head->next = head;
+                    } else {
+                        AbsenK* temp = head;
+                        while (temp->next != head)
+                            temp = temp->next;
+                        temp->next = baru;
+                        baru->next = head;
+                    }
+                } catch(...) {}
             }
-}
-    file.close();
-}
-
+        }
+        file.close();
+    }
 };
 
-// ========== SINGLE LINKED LIST UNTUK BUKU ==========
+// ===================== CLASS MANAJEMEN BUKU =====================
 class ManajemenBuku {
 private:
     struct NodeBuku {
@@ -216,35 +225,41 @@ private:
     };
 
     NodeBuku* head;
+    const string NAMA_FILE_BUKU = "buku.txt";
 
-    // Fungsi untuk memuat data dari file
+    // LOAD FORMAT TURUN KE BAWAH (NEWLINE) SESUAI REQUEST
     void muatDariFile() {
-        ifstream file("buku.txt");
+        ifstream file(NAMA_FILE_BUKU);
         if (!file.is_open()) return;
 
-        while (true) { 
-            Buku buku;
-            if (!(file >> buku.id)) break;
-            file.ignore(1000, '\n');
-            
+        Buku buku;
+        // Kita baca ID dulu sebagai pemicu loop
+        while (file >> buku.id) {
+            file.ignore(1000, '\n'); // PENTING: Skip sisa enter setelah baca angka
+
             if (!getline(file, buku.judul)) break;
             if (!getline(file, buku.penulis)) break;
             
             if (!(file >> buku.tahun)) break;
-            file.ignore(1000, '\n');
-            
+            file.ignore(1000, '\n'); 
+
             if (!getline(file, buku.isbn)) break;
             if (!getline(file, buku.kategori)) break;
             
-            if (!getline(file, buku.status)) {
-                 buku.status = "Tersedia";
-            }
-            
-            if (buku.status.empty() || (buku.status != "Tersedia" && buku.status != "Dipinjam") ) {
-                buku.status = "Tersedia";
-            }
+            // Handle status (bisa kosong atau ada)
+            if (!getline(file, buku.status)) buku.status = "Tersedia";
+            if (buku.status.empty()) buku.status = "Tersedia";
 
-            // Tambahkan ke linked list
+            if (!(file >> buku.harga)) buku.harga = 0;
+            file.ignore(1000, '\n');
+
+            if (!(file >> buku.stok)) buku.stok = 0;
+            file.ignore(1000, '\n');
+
+            if (!(file >> buku.totalTerjual)) buku.totalTerjual = 0;
+            file.ignore(1000, '\n');
+
+            // Masukkan ke Linked List
             NodeBuku* nodeBaru = new NodeBuku;
             nodeBaru->data = buku;
             nodeBaru->next = nullptr;
@@ -262,18 +277,21 @@ private:
         file.close();
     }
 
-    // Fungsi untuk menyimpan data ke file
+    // SIMPAN FORMAT TURUN KE BAWAH (NEWLINE)
     void simpanKeFile() {
-        ofstream file("buku.txt", ios::trunc);
+        ofstream file(NAMA_FILE_BUKU, ios::trunc);
         NodeBuku* temp = head;
         while (temp != nullptr) {
-            file << temp->data.id << "\n";
-            file << temp->data.judul << "\n";
-            file << temp->data.penulis << "\n";
-            file << temp->data.tahun << "\n";
-            file << temp->data.isbn << "\n";
-            file << temp->data.kategori << "\n";
-            file << temp->data.status << "\n";
+            file << temp->data.id << endl;
+            file << temp->data.judul << endl;
+            file << temp->data.penulis << endl;
+            file << temp->data.tahun << endl;
+            file << temp->data.isbn << endl;
+            file << temp->data.kategori << endl;
+            file << temp->data.status << endl;
+            file << temp->data.harga << endl;
+            file << temp->data.stok << endl;
+            file << temp->data.totalTerjual << endl;
             temp = temp->next;
         }
         file.close();
@@ -287,7 +305,6 @@ public:
 
     ~ManajemenBuku() {
         simpanKeFile();
-        // Hapus semua node
         while (head != nullptr) {
             NodeBuku* temp = head;
             head = head->next;
@@ -300,29 +317,23 @@ public:
         cout << "============= Tambah Buku =============" << endl;
         cout << "Masukkan jumlah buku yang akan ditambahkan: ";
         if (!(cin >> jumlah)) {
-            cout << "Input tidak valid. Masukkan angka.\n";
-            cin.clear();
-            cin.ignore(1000, '\n');
-            return;
+            cout << "Input tidak valid.\n";
+            cin.clear(); cin.ignore(1000, '\n'); return;
         }
+        
         if (jumlah <= 0) {
-            cout << "Jumlah harus lebih dari 0.\n";
-            cin.ignore(1000, '\n');
-            return;
+            cout << "Jumlah harus lebih dari 0.\n"; return;
         }
-        cin.ignore(1000, '\n');
 
         for (int i = 0; i < jumlah; i++) {
             Buku bukuBaru;
             cout << "\nData buku ke-" << (i + 1) << ":" << endl;
 
-            cout << "Masukkan ID Buku: ";
+            cout << "Masukkan ID Buku (Angka): ";
             while (!(cin >> bukuBaru.id)) {
-                cout << "ID harus angka. Coba lagi: ";
-                cin.clear();
-                cin.ignore(1000, '\n');
+                cout << "ID harus angka. Coba lagi: "; cin.clear(); cin.ignore(1000, '\n');
             }
-            cin.ignore(1000, '\n');
+            cin.ignore(1000, '\n'); // Bersihkan enter
 
             cout << "Masukkan Judul Buku: ";
             getline(cin, bukuBaru.judul);
@@ -332,9 +343,7 @@ public:
 
             cout << "Masukkan Tahun Terbit: ";
             while (!(cin >> bukuBaru.tahun)) {
-                cout << "Tahun harus angka. Coba lagi: ";
-                cin.clear();
-                cin.ignore(1000, '\n');
+                cout << "Tahun harus angka: "; cin.clear(); cin.ignore(1000, '\n');
             }
             cin.ignore(1000, '\n');
 
@@ -344,9 +353,21 @@ public:
             cout << "Masukkan Kategori: ";
             getline(cin, bukuBaru.kategori);
 
-            bukuBaru.status = "Tersedia";
+            cout << "Masukkan Harga Buku (Rp): ";
+            while (!(cin >> bukuBaru.harga) || bukuBaru.harga < 0) {
+                cout << "Harga valid: "; cin.clear(); cin.ignore(1000, '\n');
+            }
+            cin.ignore(1000, '\n');
 
-            // Tambahkan ke linked list
+            cout << "Masukkan Stok Awal: ";
+            while (!(cin >> bukuBaru.stok) || bukuBaru.stok < 0) {
+                cout << "Stok valid: "; cin.clear(); cin.ignore(1000, '\n');
+            }
+            cin.ignore(1000, '\n');
+
+            bukuBaru.status = (bukuBaru.stok > 0) ? "Tersedia" : "Habis";
+            bukuBaru.totalTerjual = 0;
+
             NodeBuku* nodeBaru = new NodeBuku;
             nodeBaru->data = bukuBaru;
             nodeBaru->next = nullptr;
@@ -360,30 +381,39 @@ public:
                 }
                 temp->next = nodeBaru;
             }
+            cout << "-> Buku berhasil ditambahkan." << endl;
         }
-        simpanKeFile();
-        cout << "Buku berhasil ditambahkan!" << endl;
+        simpanKeFile(); 
+        cout << "\n[SUKSES] Semua data buku berhasil disimpan." << endl;
     }
 
     void lihatbuku() {
         if (head == nullptr) {
-            cout << "Tidak ada data buku tersedia" << endl;
+            cout << "Tidak ada data buku tersedia.\n";
             return;
         }
 
-        cout << "============= Daftar Buku =============" << endl;
+        cout << "\n===============================================" << endl;
+        cout << "                  DAFTAR BUKU                  " << endl;
+        cout << "===============================================" << endl;
+        
         NodeBuku* temp = head;
         int counter = 1;
+        
         while (temp != nullptr) {
-            cout << "Buku ke-" << counter << ":\n";
-            cout << "ID Buku: " << temp->data.id << endl;
-            cout << "Judul: " << temp->data.judul << endl;
-            cout << "Penulis: " << temp->data.penulis << endl;
-            cout << "Tahun Terbit: " << temp->data.tahun << endl;
-            cout << "ISBN: " << temp->data.isbn << endl;
-            cout << "Kategori: " << temp->data.kategori << endl;
-            cout << "Status: " << temp->data.status << endl;
-            cout << "-----------------------------------" << endl;
+            cout << "Buku #" << counter << endl;
+            cout << "   ID            : " << temp->data.id << endl;
+            cout << "   Judul         : " << temp->data.judul << endl;
+            cout << "   Penulis       : " << temp->data.penulis << endl;
+            cout << "   Tahun Terbit  : " << temp->data.tahun << endl;
+            cout << "   ISBN          : " << temp->data.isbn << endl;
+            cout << "   Kategori      : " << temp->data.kategori << endl;
+            cout << "   Harga         : Rp " << (long)temp->data.harga << endl;
+            cout << "   Stok          : " << temp->data.stok << " unit" << endl;
+            cout << "   Total Terjual : " << temp->data.totalTerjual << " unit" << endl;
+            cout << "   Status        : " << temp->data.status << endl;
+            cout << "-----------------------------------------------" << endl;
+            
             temp = temp->next;
             counter++;
         }
@@ -392,170 +422,110 @@ public:
     void hapusbuku() {
         int idHapus;
         cout << "Masukkan ID Buku yang akan dihapus: ";
-        while (!(cin >> idHapus)) {
-            cout << "ID harus angka. Coba lagi: ";
-            cin.clear();
-            cin.ignore(1000, '\n');
-        }
-        cin.ignore(1000, '\n');
+        cin >> idHapus;
 
-        // Jika list kosong
         if (head == nullptr) {
-            cout << "Buku dengan ID " << idHapus << " tidak ditemukan" << endl;
-            return;
+            cout << "Data kosong." << endl; return;
         }
 
-        // Jika node pertama yang dihapus
         if (head->data.id == idHapus) {
             NodeBuku* temp = head;
             head = head->next;
             delete temp;
             simpanKeFile();
-            cout << "Buku dengan ID " << idHapus << " berhasil dihapus." << endl;
+            cout << "Buku berhasil dihapus." << endl;
             return;
         }
 
-        // Cari node yang akan dihapus
         NodeBuku* temp = head;
         while (temp->next != nullptr && temp->next->data.id != idHapus) {
             temp = temp->next;
         }
 
         if (temp->next == nullptr) {
-            cout << "Buku dengan ID " << idHapus << " tidak ditemukan" << endl;
-            return;
+            cout << "ID tidak ditemukan." << endl;
+        } else {
+            NodeBuku* nodeHapus = temp->next;
+            temp->next = nodeHapus->next;
+            delete nodeHapus;
+            simpanKeFile();
+            cout << "Buku berhasil dihapus." << endl;
         }
-
-        NodeBuku* nodeHapus = temp->next;
-        temp->next = nodeHapus->next;
-        delete nodeHapus;
-        simpanKeFile();
-        cout << "Buku dengan ID " << idHapus << " berhasil dihapus." << endl;
-    }
-
-    void pinjamBuku() {
-        int idPinjam;
-        cout << "============= Pinjam Buku =============" << endl;
-        cout << "Masukkan ID Buku yang akan dipinjam: ";
-        if (!(cin >> idPinjam)) {
-            cout << "Input tidak valid. Masukkan angka.\n";
-            cin.clear();
-            cin.ignore(1000, '\n');
-            return;
-        }
-        cin.ignore(1000, '\n');
-
-        NodeBuku* temp = head;
-        while (temp != nullptr) {
-            if (temp->data.id == idPinjam) {
-                if (temp->data.status == "Tersedia") {
-                    temp->data.status = "Dipinjam";
-                    simpanKeFile();
-                    cout << "Buku '" << temp->data.judul << "' berhasil dipinjam." << endl;
-                } else {
-                    cout << "Maaf, buku '" << temp->data.judul << "' sedang dipinjam." << endl;
-                }
-                return;
-            }
-            temp = temp->next;
-        }
-        cout << "Buku dengan ID " << idPinjam << " tidak ditemukan." << endl;
     }
 
     void kembalikanBuku() {
         int idKembali;
-        cout << "============= Kembalikan Buku =============" << endl;
-        cout << "Masukkan ID Buku yang akan dikembalikan: ";
-        if (!(cin >> idKembali)) {
-            cout << "Input tidak valid. Masukkan angka.\n";
-            cin.clear();
-            cin.ignore(1000, '\n');
-            return;
-        }
-        cin.ignore(1000, '\n');
+        cout << "Masukkan ID Buku yang dikembalikan: ";
+        cin >> idKembali;
 
         NodeBuku* temp = head;
-        while (temp != nullptr) {
-            if (temp->data.id == idKembali) {
-                if (temp->data.status == "Dipinjam") {
-                    temp->data.status = "Tersedia";
-                    simpanKeFile();
-                    cout << "Buku '" << temp->data.judul << "' berhasil dikembalikan." << endl;
+        while(temp != nullptr){
+            if(temp->data.id == idKembali){
+                if(temp->data.status == "Dipinjam"){
+                     temp->data.status = "Tersedia";
+                     // temp->data.stok++; // Opsional: Tambah stok
+                     simpanKeFile();
+                     cout << "Buku berhasil dikembalikan.\n";
                 } else {
-                    cout << "Buku '" << temp->data.judul << "' memang berstatus tersedia." << endl;
+                    cout << "Buku statusnya tidak sedang dipinjam.\n";
                 }
                 return;
             }
             temp = temp->next;
         }
-        cout << "Buku dengan ID " << idKembali << " tidak ditemukan." << endl;
+        cout << "ID Buku tidak ditemukan.\n";
     }
 };
 
+// ===================== IMPLEMENTASI MENU =====================
 void MenuKaryawan::tampilkanMenu() {
     int pilihan;
-    ManajemenBuku manajemenBuku;
-    AbsenKaryawan absenKaryawan;
-    do {
+    
+    // Instansiasi di sini agar data dimuat saat menu dibuka
+    ManajemenBuku* manajemenBuku = new ManajemenBuku();
+    AbsenKaryawan* absenKaryawan = new AbsenKaryawan(); 
 
-        cout << "========== MENU Karyawan ==========\n";
+    do {
+        cout << "\n========== MENU Karyawan njay ==========\n";
         cout << "1. Tambah Data Buku\n";
         cout << "2. Lihat Data Buku\n";
         cout << "3. Hapus Data Buku\n";
-        cout << "4. Kembalikan Buku\n";
+        cout << "4. Kembalikan Buku (Update Status)\n";
         cout << "5. Absen Masuk\n";
         cout << "6. Absen Keluar\n";
-        cout << "7. Lihat Data Absen\n";
+        cout << "7. Lihat Riwayat Absen\n";
+        cout << "8. Buat Laporan Harian\n";  // NEW
         cout << "0. Logout\n";
         cout << "Pilih menu: ";
 
         while (!(cin >> pilihan)) {
-            cout << "Input tidak valid. Masukkan angka: ";
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Pilih menu: ";
+            cout << "Input angka: ";
+            cin.clear(); cin.ignore(1000, '\n');
         }
-
-        cin.ignore(1000, '\n');
+        cin.ignore(1000, '\n'); 
 
         switch (pilihan) {
-            case 1:
-                cout << "Menambah data buku...\n\n";
-                manajemenBuku.tambahbuku();
-                break;
-            case 2:
-                cout << "Menampilkan data buku...\n\n";
-                manajemenBuku.lihatbuku();
-                break;
-            case 3:
-                cout << "Menghapus data buku...\n\n";
-                manajemenBuku.hapusbuku();
-                break;
-            case 4:
-                cout << "Mengembalikan buku...\n\n";
-                manajemenBuku.kembalikanBuku();
-                break;
-            case 5:
-                cout << "Absen Masuk...\n\n";
-                absenKaryawan.absenMasuk();
-                break;
-            case 6:
-                cout << "Absen Keluar...\n\n";
-                absenKaryawan.absenKeluar();
-                break;
-            case 7:
-                cout << "Melihat data absen...\n\n";
+            case 1: manajemenBuku->tambahbuku(); break;
+            case 2: manajemenBuku->lihatbuku(); break;
+            case 3: manajemenBuku->hapusbuku(); break;
+            case 4: manajemenBuku->kembalikanBuku(); break;
+            case 5: absenKaryawan->absenMasuk(); break;
+            case 6: absenKaryawan->absenKeluar(); break;
+            case 7: {
                 int id;
-                cout << "Masukkan ID Karyawan: ";
-                cin >> id;
-                absenKaryawan.tampilAbsenSendiri(id);
+                cout << "Masukkan ID Karyawan: "; cin >> id;
+                absenKaryawan->tampilAbsenSendiri(id);
                 break;
-            case 0:
-                cout << "Logout berhasil!\n";
+            }
+            case 8:
+                buatLaporanHarian("", "");  // User will input manually
                 break;
-            default:
-                cout << "Pilihan tidak valid!\n";
+            case 0: cout << "Logout berhasil!\n"; break;
+            default: cout << "Pilihan tidak valid!\n";
         }
-        cout << endl;
     } while (pilihan != 0);
+    
+    // Cleanup - destructor akan dipanggil otomatis dan menyimpan data
+    delete manajemenBuku;
+    delete absenKaryawan;
 }
