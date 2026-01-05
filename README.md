@@ -9,6 +9,8 @@ g++ -o output/main.exe main.cpp auth/Login.cpp auth/ManajemenUser.cpp admin/Menu
 ## Cara running
 .\output\main.exe
 
+## Cara Compile And Running jika cara compile 1 dan 2 gagal
+PowerShell -ExecutionPolicy Bypass -File .\build.ps1
 
 ## Total Baris
 6000++ baris
@@ -370,6 +372,7 @@ Project ini mengimplementasikan **9 struktur data berbeda** untuk berbagai keper
 - **Tree structures** (AVL, BST, Huffman) untuk operasi efisien
 - **Linear structures** (Stack, Queue, Linked List) untuk manajemen data
 - **Specialized structures** (Priority Queue, Circular LL, Dynamic Array) untuk use case spesifik
+
 
 
 
